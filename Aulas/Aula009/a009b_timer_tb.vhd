@@ -5,36 +5,43 @@ entity a009b_timer_tb is
 end entity;
 
 architecture sim of a009b_timer_tb is
-    constant clockFreq      :   integer := 10;
-    constant clkPer         :   time := 1000 ms/clockFreq;
+    -- Parâmetros do clock para o testbench
+    constant clockFreq : integer := 10;               -- Frequência de referência (Hz)
+    constant clkPer    : time    := 1000 ms / clockFreq; -- Período de clock (1/clockFreq s)
 
-    signal clk, nRst    :   std_logic   := '0'; 
-
-    signal segundo      :   integer range 0 to 60;
-    signal minuto       :   integer range 0 to 60;
-    signal hora         :   integer range 0 to 24;
-
+    -- Sinais de estímulo e observação
+    signal clk, nRst  : std_logic := '0';            -- Clock e reset assíncrono (ativo em '0')
+    signal segundo    : integer range 0 to 60;        -- Contador de segundos (0–59)
+    signal minuto     : integer range 0 to 60;        -- Contador de minutos (0–59)
+    signal hora       : integer range 0 to 24;        -- Contador de horas (0–23)
 begin
-    -- Dispositivo sobre teste (device under test - DUT)
-    i_timer : entity work.a18_timer(rtl)
-        generic map(clockFreq)
-        port map(clk, nRst, segundo, minuto, hora);
+    -- Instanciação do dispositivo sob teste (DUT): timer com horas, minutos e segundos
+    i_timer: entity work.a18_timer(rtl)
+        generic map (
+            clockFreq => clockFreq  -- Mapeia a frequência genérica ao DUT
+        )
+        port map (
+            clk     => clk,        -- Conecta sinal de clock ao DUT
+            nRst    => nRst,       -- Conecta sinal de reset ao DUT
+            s       => segundo,    -- Conecta saída de segundos do DUT
+            m       => minuto,     -- Conecta saída de minutos do DUT
+            h       => hora        -- Conecta saída de horas do DUT
+        );
 
-    -- Clock
+    -- Geração de clock: alterna o sinal clk após metade do período definido
     clk <= not clk after clkPer / 2;
 
-    -- Reset
+    -- Processo de controle de reset
     process is
     begin
+        -- Aguarda duas bordas de subida para garantir sincronização inicial
         wait until rising_edge(clk);
         wait until rising_edge(clk);
 
-        -- Removo o sistema do reset
-        nRst <= '1';
+        -- Libera o reset para começar a contagem
+        nRst <= '1';          -- Desativa o reset assíncrono (nível alto)
 
-        wait;
+        wait;                -- Suspende o processo indefinidamente, mantendo o testbench ativo
     end process;
 
 end architecture;
-
-
