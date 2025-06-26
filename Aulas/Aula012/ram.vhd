@@ -24,7 +24,7 @@ entity ram is
 
 end ram;
 
-architecture rtl of single_port_ram_with_init is
+architecture rtl of ram is
 
 	-- Controi um array de std_logic_vector para compor os elementos da memória
 	subtype word_t is std_logic_vector(DATA_WIDTH - 1 downto 0);         -- Define o tipo de uma palavra na RAM
@@ -45,7 +45,7 @@ architecture rtl of single_port_ram_with_init is
 	-- Declare the RAM signal and specify a default value.	Quartus Prime
 	-- will create a memory initialization file (.mif) based on the 
 	-- default value.
-	signal ram : memory_t := init_ram();            -- Instancia a RAM com conteúdo inicial
+	signal ram : memory_t := init_ram;            -- Instancia a RAM com conteúdo inicial
 
 	-- Register to hold the address 
 	signal addr_reg : unsigned(ADDR_WIDTH - 1 downto 0);   -- Registrador para armazenar o endereço lido
@@ -55,7 +55,7 @@ begin
 	process(clk)
 	begin
 	if(rising_edge(clk)) then                     -- Executa na borda de subida do clock
-		if(we = '1') then                         -- Verifica se escrita está habilitada
+		if(we = '0') then                         -- Verifica se escrita está habilitada
 			ram(to_integer(addr)) <= data;                    -- Escreve o dado no endereço especificado
 		end if;
 
@@ -64,6 +64,6 @@ begin
 	end if;
 	end process;
 
-	q <= ram(to_integer(addr));                           -- Atribui à saída o conteúdo lido da RAM
+	q <= ram(to_integer(addr_reg));                           -- Atribui à saída o conteúdo lido da RAM
 
 end rtl;
