@@ -2,6 +2,13 @@
 
 **Objetivo:** Desenvolver um procedimento que calcule a média de uma série de valores inseridos e retorne o resultado como um sinal de saída. O procedimento deve receber uma array de inteiros e o tamanho da array, e deve produzir um sinal de saída com a média calculada.
 
+**Paços sugeridos:**
+1. Crie um testbench e declare o procedimento na parte declarativa da arquitetura.
+2. Defina um tipo array de inteiros na parte declarativa da arquitetura (leia o texto abaixo)
+3. Crie uma constante do tipo array de inteiros
+4. Inicialize o array com os valores que se deseja fazer a média
+5. Chame o procedimento na arquitetura e imprima o resultado com o comando `report`
+
 ---
 
 ## Como fazer um array de inteiros em VHDL?

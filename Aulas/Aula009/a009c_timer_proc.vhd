@@ -6,11 +6,11 @@ entity a009c_timer_proc is
         clockFreq : integer := 50e6  -- Frequência de clock do sistema (padrao 50 MHz)
     );
     port(
-        clk  : in  std_logic;       -- Sinal de clock de entrada
-        nRst : in  std_logic;       -- Reset assíncrono ativo em nível baixo
-        s    : inout integer;       -- Contador de segundos (0–59)
-        m    : inout integer;       -- Contador de minutos (0–59)
-        h    : inout integer        -- Contador de horas   (0–23)
+        clk  : in       std_logic;       -- Sinal de clock de entrada
+        nRst : in       std_logic;       -- Reset assíncrono ativo em nível baixo
+        s    : buffer   integer;       -- Contador de segundos (0–59)
+        m    : buffer   integer;       -- Contador de minutos (0–59)
+        h    : buffer   integer        -- Contador de horas   (0–23)
     );
 end entity;
 

@@ -22,7 +22,7 @@ architecture sim of a008d_contador_tb is
 begin
 
     -- Instanciação do contador
-    i_cont    : entity work.a17b_contador(rtl)
+    i_cont    : entity work.a008c_contador(rtl)
         generic map(n => n)                                  -- Mapeia o número de bits para o contador.
         port map(
             clk => clk,

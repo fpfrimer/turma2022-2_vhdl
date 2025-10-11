@@ -8,11 +8,11 @@ entity a009a_timer is
         clockFreq : integer := 10  -- Frequência de entrada em Hz (padrão: 10 Hz)
     );
     port(
-        clk   : inout std_logic;                    -- Sinal de clock para contagem
-        nRst  : inout std_logic;                    -- Reset assíncrono ativo em nível baixo
-        s     : inout integer range 0 to 60;        -- Contador de segundos (0–59)
-        m     : inout integer range 0 to 60;        -- Contador de minutos (0–59)
-        h     : inout integer range 0 to 24         -- Contador de horas (0–23)
+        clk   : in      std_logic;                    -- Sinal de clock para contagem
+        nRst  : in      std_logic;                    -- Reset assíncrono ativo em nível baixo
+        s     : buffer  integer range 0 to 60;        -- Contador de segundos (0–59)
+        m     : buffer  integer range 0 to 60;        -- Contador de minutos (0–59)
+        h     : buffer  integer range 0 to 24         -- Contador de horas (0–23)
     );
 end entity;
 

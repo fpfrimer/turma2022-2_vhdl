@@ -11,7 +11,7 @@
 begin
 
     -- Instanciação do dispositivo sob teste (DUT)
-    i_ff: entity work.a17_flipFlop(rtl)
+    i_ff: entity work.a008a_flipFlop(rtl)
         port map(
             clk  => clk,   -- Conecta o clock do testbench ao DUT
             nRst => nRst,  -- Conecta o reset assíncrono ao DUT
