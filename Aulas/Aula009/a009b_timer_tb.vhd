@@ -16,7 +16,7 @@ architecture sim of a009b_timer_tb is
     signal hora       : integer range 0 to 24;        -- Contador de horas (0–23)
 begin
     -- Instanciação do dispositivo sob teste (DUT): timer com horas, minutos e segundos
-    i_timer: entity work.a18_timer(rtl)
+    i_timer: entity work.a009a_timer(rtl)
         generic map (
             clockFreq => clockFreq  -- Mapeia a frequência genérica ao DUT
         )

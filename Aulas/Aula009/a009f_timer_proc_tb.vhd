@@ -19,7 +19,7 @@ architecture sim of a009f_timer_proc_tb is
 
 begin
     -- Instanciação do dispositivo sob teste (DUT): timer com procedimento
-    i_timer : entity work.a19_timer(rtl)
+    i_timer : entity work.a009c_timer_proc(rtl)
         generic map(
             clockFreq => clockFreq        -- Mapeia a frequência genérica para o DUT
         )

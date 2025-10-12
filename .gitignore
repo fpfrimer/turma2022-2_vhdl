@@ -37,6 +37,8 @@ vsim.wlf
 *.do
 *.vcd
 *.svf
+*.mpf
+*.mti
 
 # Arquivos e diretórios de outros sistemas de versionamento
 **/.svn/

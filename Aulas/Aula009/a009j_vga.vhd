@@ -74,7 +74,7 @@ architecture rtl of a009j_vga is
     end procedure;
 
     -- Alias para simplificar uso do clock
-a    alias clk : std_logic is MAX10_CLK1_50;
+    alias clk : std_logic is MAX10_CLK1_50;
 
     -- Sinais de varredura e flag de área ativa
     signal horizontal : integer range 0 to H_PIXELS := 0; -- Contador de pixel horizontal
