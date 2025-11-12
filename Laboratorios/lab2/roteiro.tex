@@ -1,0 +1,106 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{hyperref}
+\usepackage{upgreek}
+\usepackage{graphicx}
+\geometry{margin=2.5cm}
+
+\title{Laboratório 2 -- Sensor Ultrassônico HC-SR04}
+\author{Prof. Felipe Walter Dafico Pfrimer \\ Disciplina de Lógica Reconfigurável}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Introdução}
+
+Neste laboratório os alunos deverão acionar e medir distâncias com o sensor ultrassônico HC-SR04 usando o kit DE10-Lite. O objetivo é gerar o pulso de trigger, medir a largura do pulso de echo, converter esse tempo em distância expressa em centímetros com precisão de milímetros (mm) e mostrar o resultado no display de sete segmentos. Para referência técnica, consulte o \textit{datasheet} do sensor: \\
+https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf
+
+\section{Sobre o sensor HC-SR04}
+
+O módulo HC-SR04 é um sensor de distância ultrassônico de baixo custo, com quatro pinos, conforme ilustrado na Figura~\ref{fig:hcsr04}. Seus pinos são:
+
+\begin{itemize}
+    \item \textbf{VCC}: alimentação (neste laboratório, 3,3\,V);
+    \item \textbf{Trigger}: entrada: um pulso de 10\,$\upmu$s inicia a medição;
+    \item \textbf{Echo}: saída: permanece em nível alto durante o tempo de propagação do som (ida e volta);
+    \item \textbf{GND}: aterramento.
+\end{itemize}
+    
+
+\begin{figure}[htbp!]
+\centering
+\includegraphics[width=0.5\textwidth]{UltrasonicSensor.jpg}\\
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{VCC} & \textbf{Trigger} & \textbf{Echo} & \textbf{GND} \\
+\hline
+\end{tabular}
+\caption{Disposição dos pinos do sensor HC-SR04 (vista frontal, com os pinos voltados para você).}
+\label{fig:hcsr04}
+\end{figure}
+
+\noindent\textbf{Atenção}: a ordem dos pinos é fixa. Nunca inverta VCC e GND!
+
+O sensor opera com base na medição do tempo de voo (\textit{time-of-flight}) de uma onda ultrassônica. Ao receber um pulso de \texttt{Trigger} com duração de pelo menos 10$ \upmu$s, o módulo emite 8 pulsos sonoros a 40 kHz e, em seguida, coloca o pino \texttt{Echo} em nível alto. Esse sinal permanece alto durante o tempo que o som leva para ir até o obstáculo e retornar ao sensor. A duração do pulso \texttt{Echo}, portanto, corresponde ao tempo total de ida e volta, o que permite calcular a distância usando a velocidade do som no ar.
+
+\section{Objetivos}
+
+\begin{itemize}
+    \item Integrar o sensor HC-SR04 ao kit DE10-Lite e implementar a interface física necessária (alimentação 3,3 V).
+    \item Gerar o pulso de trigger de 10 $\upmu$s e medir a duração do pulso de echo em ciclos de clock.
+    \item Desenvolver uma máquina de estados finitos (FSM) que controle o sequenciamento: gerar trigger, aguardar borda de subida do echo, contar enquanto echo estiver alto, e computar a distância.
+    \item Implementar um contador/timer robusto capaz de medir intervalos de tempo com resolução suficiente para obter precisão em mm\footnote{Embora a acurácia do sensor seja de ±3 mm, o sistema deve ser projetado para resolução de 1 mm, ou seja, capaz de distinguir variações de 1 mm no valor calculado.}.
+    \item Exibir o valor da distância em centímetros com precisão de mm nos displays de 7 segmentos (HEX0..HEX3) ou outro meio de saída (UART ou VGA, se preferir).
+\end{itemize}
+
+\section{Instruções, Considerações técnicas e dicas}
+
+\begin{itemize}
+    \item A atividade pode ser individual ou em dupla.
+    \item Duplas devem acionar dois sensores HC-SR04 simultaneamente, mostrando as distâncias de forma multiplexada nos displays (alternando entre as leituras com uma chave).
+    \item Hardware: O HC-SR04 normalmente opera com 5 V, mas os sensores fornecidos neste laboratório são compatíveis com alimentação de 3,3 V. Alimente o sensor exclusivamente com 3,3 V. Se alimentado com 5 V, o pino ECHO poderá emitir 5 V, o que danifica os pinos de entrada do FPGA DE10-Lite, que não toleram tensões acima de 3,3 V.
+    \item A distância é calculada a partir do tempo de duração do pulso \texttt{ECHO}, que corresponde ao tempo de ida \emph{e volta} do pulso sonoro. Considerando a velocidade do som no ar ($v \approx 343\,\mathrm{m/s} = 343\,000\,\mathrm{mm/s}$), a distância percorrida até o obstáculo é metade da distância total:
+    \begin{equation}
+        d = \frac{v \cdot t}{2}
+    \end{equation}
+    onde $t$ é o tempo de viagem (ida e volta) em segundos. Substituindo $t = t_{\mu s} \times 10^{-6}$ (com $t_{\mu s}$ em microssegundos), obtemos:
+    \begin{equation}
+        d\ (\mathrm{mm}) = \frac{343\,000 \cdot (t_{\mu s} \times 10^{-6})}{2} = \frac{343 \cdot t_{\mu s}}{2000}
+    \end{equation}
+    Alternativamente, em centímetros, uma aproximação comum usada no \textit{datasheet} é:
+    \begin{equation}
+        d\ (\mathrm{cm}) = \frac{t_{\mu s}}{58}
+    \end{equation}
+    Para este laboratório, utilize a equação em milímetros para garantir resolução de $1\,\mathrm{mm}$, mesmo que a acurácia física do sensor seja limitada a $\pm 3\,\mathrm{mm}$.
+    \item Contador/Timer: meça o tempo do pulso ECHO em número de ciclos do clock do FPGA. Exemplificando para clock de 50\,MHz (ciclo = 20\,ns):
+        \begin{equation}
+        \text{tempo de echo} \, (\upmu\text{s}) = \frac{\text{contagens}}{50}
+        \end{equation}
+      Em aritmética inteira, faça as operações na ordem que preserve precisão (multiplicações antes de divisões).
+    \item FSM sugerida: IDLE → TRIGGER (gerar 10 µs) → WAIT\_RISING (aguardar borda de subida de ECHO) → COUNT\_HIGH (contar enquanto ECHO=1) → COMPUTE (calcular distância) → DISPLAY → IDLE.
+    \item Taxa de medição: limite a frequência de medições para evitar leituras espúrias (por ex. 10–20 medições por segundo).
+    \item Faixa máxima e largura do contador: dimensione o contador para suportar o tempo máximo de retorno do sensor.
+    \item Utilize os displays HEX3 a HEX0 para exibir até 3 dígitos inteiros e 1 dígito fracionário. Por exemplo, para 12.3 cm: HEX2=1, HEX1=2 (com ponto decimal aceso), HEX0=3, e HEX3 apagado (ou zero, conforme critério).
+    \item Caso precise de algum instrumento de medição (osciloscópio, multímetro, etc.), solicite ao professor com antecedência.
+    \item Entregue as questões a seguir para o professor no dia da apresentação por escrito. Não entregue arquivos digitais.
+\end{itemize}
+
+
+\section{Questões para entrega}
+
+\begin{enumerate}
+    \item Explique a FSM implementada e justifique as transições de estados.
+    \item Como foi dimensionado o contador/timer (largura em bits) e por quê?
+    \item Detalhe a conversão de contagens do clock para distância em mm (ordem das operações, para evitar perda de precisão).
+    \item Quais foram os principais desafios encontrados na implementação e como foram superados?
+\end{enumerate}
+
+\end{document}
