@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.3.4)  12 NOV 2025 19:29
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.3.4)  12 NOV 2025 20:01
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**d:/repos/turma2022-2_vhdl/Laboratorios/lab2/roteiro.tex
-(d:/repos/turma2022-2_vhdl/Laboratorios/lab2/roteiro.tex
+**d:/repos/turma2022-2_vhdl/Laboratorios/lab3/roteiro.tex
+(d:/repos/turma2022-2_vhdl/Laboratorios/lab3/roteiro.tex
 LaTeX2e <2022-11-01> patch level 1
 L3 programming layer <2023-02-22> (c:/texlive/2022/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2022/07/02 v1.4n Standard LaTeX document class
@@ -355,35 +355,31 @@ Package hyperref Info: Link coloring OFF on input line 17.
 \@outlinefile=\write3
 \openout3 = `roteiro.out'.
 
-<UltrasonicSensor.jpg, id=25, 602.25pt x 366.36874pt>
-File: UltrasonicSensor.jpg Graphic file (type jpg)
-<use UltrasonicSensor.jpg>
-Package pdftex.def Info: UltrasonicSensor.jpg  used on input line 40.
-(pdftex.def)             Requested size: 236.01561pt x 143.57643pt.
  [1
 
 {c:/texlive/2022/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-Overfull \hbox (1.15414pt too wide) in paragraph at lines 68--69
-[]\OT1/cmr/m/n/12 Duplas de-vem aci-o-nar dois sen-so-res HC-SR04 si-mul-ta-ne-a-mente, mos-trando as dist^ancias
- []
-
-[2 <./UltrasonicSensor.jpg>] [3] [4] (./roteiro.aux)
+<filtor.png, id=37, 272.217pt x 165.61874pt>
+File: filtor.png Graphic file (type png)
+<use filtor.png>
+Package pdftex.def Info: filtor.png  used on input line 58.
+(pdftex.def)             Requested size: 330.42041pt x 201.05128pt.
+ [2 <./filtor.png>] [3] (./roteiro.aux)
 Package rerunfilecheck Info: File `roteiro.out' has not changed.
-(rerunfilecheck)             Checksum: DFB5A8A354E9D8D4BA00DF2D008D2418;786.
+(rerunfilecheck)             Checksum: 7C334DCE6B8DF9203E9F9A74F0C5AD2A;833.
  ) 
 Here is how much of TeX's memory you used:
- 10972 strings out of 476024
- 171595 string characters out of 5794017
- 1862382 words of memory out of 5000000
- 31264 multiletter control sequences out of 15000+600000
- 521669 words of font info for 65 fonts, out of 8000000 for 9000
+ 10952 strings out of 476024
+ 171312 string characters out of 5794017
+ 1861382 words of memory out of 5000000
+ 31255 multiletter control sequences out of 15000+600000
+ 520308 words of font info for 60 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,8n,76p,637b,540s stack positions out of 10000i,1000n,20000p,200000b,200000s
-{c:/texlive/2022/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}<c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/euler/eurm10.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb>
-Output written on roteiro.pdf (4 pages, 215855 bytes).
+ 75i,7n,76p,558b,587s stack positions out of 10000i,1000n,20000p,200000b,200000s
+{c:/texlive/2022/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}<c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb><c:/texlive/2022/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb>
+Output written on roteiro.pdf (3 pages, 138650 bytes).
 PDF statistics:
- 142 PDF objects out of 1000 (max. 8388607)
- 103 compressed objects within 2 object streams
- 20 named destinations out of 1000 (max. 500000)
+ 105 PDF objects out of 1000 (max. 8388607)
+ 77 compressed objects within 1 object stream
+ 13 named destinations out of 1000 (max. 500000)
  46 words of extra memory for PDF output out of 10000 (max. 10000000)
 

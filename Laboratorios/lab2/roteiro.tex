@@ -47,9 +47,9 @@ O módulo HC-SR04 é um sensor de distância ultrassônico de baixo custo, com q
 \label{fig:hcsr04}
 \end{figure}
 
-\noindent\textbf{Atenção}: a ordem dos pinos é fixa. Nunca inverta VCC e GND!
+% \noindent\textbf{Atenção}: a ordem dos pinos é fixa. Nunca inverta VCC e GND!
 
-O sensor opera com base na medição do tempo de voo (\textit{time-of-flight}) de uma onda ultrassônica. Ao receber um pulso de \texttt{Trigger} com duração de pelo menos 10$ \upmu$s, o módulo emite 8 pulsos sonoros a 40 kHz e, em seguida, coloca o pino \texttt{Echo} em nível alto. Esse sinal permanece alto durante o tempo que o som leva para ir até o obstáculo e retornar ao sensor. A duração do pulso \texttt{Echo}, portanto, corresponde ao tempo total de ida e volta, o que permite calcular a distância usando a velocidade do som no ar.
+O sensor opera com base na medição do tempo de voo (\textit{time-of-flight}) de uma onda ultrassônica. Ao receber um pulso de \texttt{Trigger} com duração de pelo menos 10 $\upmu$s, o módulo emite 8 pulsos sonoros a 40 kHz e, em seguida, coloca o pino \texttt{Echo} em nível alto. Esse sinal permanece alto durante o tempo que o som leva para ir até o obstáculo e retornar ao sensor. A duração do pulso \texttt{Echo}, portanto, corresponde ao tempo total de ida e volta, o que permite calcular a distância usando a velocidade do som no ar.
 
 \section{Objetivos}
 
@@ -89,6 +89,8 @@ O sensor opera com base na medição do tempo de voo (\textit{time-of-flight}) d
     \item Taxa de medição: limite a frequência de medições para evitar leituras espúrias (por ex. 10–20 medições por segundo).
     \item Faixa máxima e largura do contador: dimensione o contador para suportar o tempo máximo de retorno do sensor.
     \item Utilize os displays HEX3 a HEX0 para exibir até 3 dígitos inteiros e 1 dígito fracionário. Por exemplo, para 12.3 cm: HEX2=1, HEX1=2 (com ponto decimal aceso), HEX0=3, e HEX3 apagado (ou zero, conforme critério).
+    \item Para acionar os displays, é opcional utilizar o seguinte pacote \url{https://github.com/fpfrimer/sevenSegPro}.
+    \item Teste o sistema com objetos a diferentes distâncias.
     \item Caso precise de algum instrumento de medição (osciloscópio, multímetro, etc.), solicite ao professor com antecedência.
     \item Entregue as questões a seguir para o professor no dia da apresentação por escrito. Não entregue arquivos digitais.
 \end{itemize}

@@ -1,0 +1,104 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{hyperref}
+\usepackage{upgreek}
+\usepackage{graphicx}
+\geometry{margin=2.5cm}
+
+\title{Laboratório 3 -- Filtro de Média Móvel no Sensor HC-SR04}
+\author{Prof. Felipe Walter Dafico Pfrimer \\ Disciplina de Lógica Reconfigurável}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Introdução}
+
+Neste laboratório, os alunos deverão implementar um \textbf{filtro de média móvel} sobre as leituras do sensor ultrassônico HC-SR04, utilizando o kit DE10-Lite. O objetivo é suavizar as variações aleatórias (ruído) nas medições de distância, produzindo uma saída mais estável e confiável. O sistema deve permitir ao usuário alternar entre a exibição do sinal \textbf{bruto} (não filtrado) e do sinal \textbf{filtrado}, usando um botão ou chave do kit.
+
+Este laboratório complementa o Laboratório 2, exigindo que os alunos reutilizem a FSM de medição e adicionem um novo bloco de processamento: o filtro de média móvel. A Figura~\ref{fig:ma_filter} ilustra o funcionamento básico deste tipo de filtro.
+
+\section{Objetivos}
+
+\begin{itemize}
+    \item Implementar um filtro de média móvel (Moving Average Filter) com janela de tamanho $N$ (por exemplo, $N=4$ ou $N=8$), utilizando memória circular (shift register);
+    \item Integrar o filtro ao sistema de medição do sensor HC-SR04, mantendo a mesma interface de hardware e exibição;
+    \item Permitir ao usuário selecionar entre o sinal bruto e o sinal filtrado, por meio de um botão ou chave do kit (ex.: KEY0 = bruto, KEY1 = filtrado);
+    \item Visualizar o impacto do filtro na resposta temporal e na estabilidade da medida;
+    \item Avaliar visualmente a redução de ruído e o atraso introduzido pelo filtro.
+\end{itemize}
+
+\section{Sobre o filtro de média móvel}
+
+O filtro de média móvel é um tipo simples de \textbf{filtro digital FIR} (Finite Impulse Response) que calcula a média aritmética dos últimos $N$ valores de entrada. Ele é amplamente utilizado em sistemas embarcados por sua simplicidade e baixo custo computacional.
+
+Matematicamente, a saída $y[n]$ é dada por:
+
+\begin{equation}
+    y[n] = \frac{1}{N} \sum_{k=0}^{N-1} x[n-k]
+\end{equation}
+
+onde:
+\begin{itemize}
+    \item $x[n]$ é o valor atual da amostra;
+    \item $x[n-1], x[n-2], \dots, x[n-(N-1)]$ são as $N-1$ amostras anteriores;
+    \item $N$ é o tamanho da janela (número de amostras consideradas).
+\end{itemize}
+
+A Figura~\ref{fig:ma_filter} mostra a estrutura típica desse filtro: uma cadeia de registradores de deslocamento (shift registers) armazena as últimas $N$ amostras, que são somadas e divididas por $N$ para gerar a saída filtrada.
+
+\begin{figure}[htbp!]
+\centering
+\includegraphics[width=0.7\textwidth]{filtor.png} % Substitua pelo nome real da imagem
+\caption{Estrutura de um filtro de média móvel com janela de tamanho $N$. As amostras $x[n], x[n-1], \dots, x[n-(N-1)]$ são somadas e divididas por $N$ para produzir a saída $y[n]$.}
+\label{fig:ma_filter}
+\end{figure}
+
+\noindent\textbf{Observação}: Em arquiteturas sem unidade de ponto flutuante (como FPGAs), a divisão por $N$ pode ser substituída por um \textbf{deslocamento à direita} se $N$ for potência de 2 (ex.: $N=4 \rightarrow$ deslocar 2 bits; $N=8 \rightarrow$ deslocar 3 bits). Isso preserva a precisão e evita operações custosas.
+
+\section{Instruções, considerações técnicas e dicas}
+
+\begin{itemize}
+    \item Este laboratório \textbf{depende do Laboratório 2}. Reutilize seu código anterior (FSM, contador, conversão para milímetros, exibição nos displays) como base;
+    \item A atividade pode ser realizada individualmente ou em dupla;
+    \item \textbf{Filtro de média móvel}:
+    \begin{itemize}
+        \item Implemente uma memória circular (shift register) de profundidade $N$ (recomenda-se $N=4$ ou $N=8$);
+        \item A cada nova medição, insira o valor atual no shift register e remova o mais antigo;
+        \item Calcule a soma das $N$ amostras e divida por $N$ (utilizando deslocamento se $N$ for potência de 2);
+        \item Armazene o resultado filtrado para exibição.
+    \end{itemize}
+
+    \item \textbf{Seleção entre sinal bruto e filtrado}:
+    \begin{itemize}
+        \item Use um botão (ex.: KEY0) ou chave (SW0) para alternar entre os modos;
+        \item Se o botão estiver pressionado (ou a chave ligada), exiba o sinal filtrado; caso contrário, exiba o sinal bruto;
+        \item Idealmente, indique no display qual modo está ativo (ex.: “B” para bruto, “F” para filtrado, ou utilize um LED indicador).
+    \end{itemize}
+
+    \item \textbf{Taxa de amostragem}: mantenha a mesma taxa do Laboratório 2 (10–20 Hz) para evitar sobrecarga e garantir estabilidade do filtro;
+    \item \textbf{Precisão}: como o filtro envolve soma de múltiplos valores, dimensione os registradores de soma com largura suficiente para evitar overflow (ex.: se $N=8$ e cada amostra possui 16 bits, a soma pode chegar a $8 \times 2^{16}$ — use 20 bits ou mais);
+    \item \textbf{Exibição}: mostre a distância nos displays HEX0..HEX3, conforme definido no Laboratório 2. Adicione um indicador visual (LED ou caractere no display) para mostrar se o modo é bruto ou filtrado;
+    \item \textbf{Análise prática}: ao testar, observe:
+    \begin{itemize}
+        \item Quanto ruído é eliminado?
+        \item Há atraso perceptível entre o movimento do objeto e a resposta no display?
+        \item O que ocorre se você aumentar ou diminuir $N$?
+    \end{itemize}
+    \item Entregue as questões a seguir ao professor, \textbf{por escrito}, no dia da apresentação. Não serão aceitos arquivos digitais.
+\end{itemize}
+
+\section{Questões para entrega}
+
+\begin{enumerate}
+    \item Explique como você atualiza o filtro a cada nova medição.
+    \item Explique seu planejamento para resolver esse laboratório a partir do código do Laboratório 2.
+\end{enumerate}
+
+\end{document}
