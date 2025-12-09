@@ -8,6 +8,8 @@
 \usepackage[brazil]{babel}
 \usepackage{graphicx}
 \usepackage{hyperref}
+% Ajuste de margens: 2 cm em todos os lados
+\usepackage[a4paper,margin=2.0cm]{geometry}
 \usepackage{amsmath, amssymb}
 \usepackage{lipsum}
 
@@ -41,7 +43,10 @@
   numbers=left,
   numberstyle=\tiny\color{gray},
   stepnumber=1,
-  numbersep=8pt,
+  % Ajustes para que os números de linha fiquem alinhados à margem
+  numbersep=5pt,
+  xleftmargin=15pt,
+  framexleftmargin=0pt,
   tabsize=2,
   showstringspaces=false,
   breaklines=true

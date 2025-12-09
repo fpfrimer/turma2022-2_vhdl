@@ -1,7 +1,7 @@
 % Capítulo intordutório sobre VHDL
 \chapter{Introdução}
 
-Esta apostila apresenta conceitos fundamentais de VHDL utilizados na disciplina, introduzindo a base tecnológica e a linguagem de descrição.
+Esta apostila apresenta conceitos fundamentais de VHDL utilizados na disciplina, introduzindo a base tecnológica e a linguagem de descrição. Especificamente, este capítulo aborda a definição de Dispositivos Lógicos Programáveis (PLDs), a importância das Linguagens de Descrição de Hardware (HDLs) e uma introdução ao VHDL.
 
 \section{O que são Dispositivos Lógicos Programáveis?}
 
@@ -25,7 +25,7 @@ Atualmente, as HDLs mais populares para configurar PLDs são o \textbf{VHDL} (\t
 
 A sigla VHDL significa \textbf{VHSIC Hardware Description Language}, onde VHSIC é o acrônimo para \textit{Very High Speed Integrated Circuit}. Desenvolvida na década de 1980 pelo Departamento de Defesa dos Estados Unidos, a linguagem foi criada para documentar e simular o comportamento de circuitos integrados complexos. Com o tempo, o VHDL evoluiu e se tornou um padrão internacional (IEEE 1076), amplamente adotado na indústria eletrônica para o design de sistemas digitais.
 
-Para exemplificar, considere o trecho o código \ref{cod:porta_and} escrito em VHDL, que descreve uma porta AND de duas entradas. Não se preocupe em entender todos os detalhes agora; o objetivo é apenas ilustrar a estrutura básica de um arquivo VHDL.
+Para exemplificar, considere o trecho de código \ref{cod:porta_and} escrito em VHDL, que descreve uma porta AND de duas entradas. Não se preocupe em entender todos os detalhes agora; o objetivo é apenas ilustrar a estrutura básica da linguagem.
 
 \begin{code}
 \caption{Exemplo de uma porta AND em VHDL}
@@ -51,9 +51,9 @@ end rtl;
 Observe no Código \ref{cod:porta_and} a estrutura básica de um arquivo VHDL:
 
 \begin{itemize}
-    \item \textbf{Bibliotecas:} As linhas iniciais importam a biblioteca \texttt{ieee}, necessária para usar o tipo de dado padrão \texttt{std\_logic}.
-    \item \textbf{Entidade (Entity):} Define a interface do componente, ou seja, suas entradas (\texttt{A}, \texttt{B}) e saídas (\texttt{Y}). É a "caixa preta" vista de fora.
-    \item \textbf{Arquitetura (Architecture):} Descreve o comportamento interno. Neste caso, a saída \texttt{Y} recebe o resultado da operação lógica AND entre \texttt{A} e \texttt{B}.
+    \item \textbf{Bibliotecas:} As linhas iniciais importam a biblioteca \texttt{ieee}, necessária para usar o tipo de dado padrão \texttt{std\_logic}. Outras bibliotecas podem ser incluídas conforme a complexidade do projeto.
+    \item \textbf{Entidade (Entity):} Define a interface do componente, ou seja, suas entradas (\texttt{A}, \texttt{B}) e saídas (\texttt{Y}). É a "caixa preta" vista de fora. Aqui, o projetista deve prever quais sinais o componente receberá e quais ele fornecerá.
+    \item \textbf{Arquitetura (Architecture):} Descreve o comportamento interno. Neste caso, a saída \texttt{Y} recebe o resultado da operação lógica AND entre \texttt{A} e \texttt{B}. É nessa região que os iniciantes em VHDL possuem maior dificuldade, pois já estão acostumados a pensar em termos de sequências de comandos comuns nas linguagens de programação. Dessa forma, o VHDL exige uma mentalidade de descrição concorrente. Na arquitetura, todas as operações são consideradas simultâneas, refletindo a natureza paralela do \textit{hardware} alvo.
 \end{itemize}
 
 Além da descrição para síntese (criação do circuito físico), o VHDL é amplamente utilizado para \textbf{simulação}. Isso permite que os desenvolvedores validem o comportamento do circuito no computador antes de implementá-lo no PLD, economizando tempo e garantindo a confiabilidade do projeto.
@@ -93,6 +93,57 @@ end behavior;
 \end{lstlisting}    
 \end{code}
 
-\section{Fluxo de Projeto (Design Flow)}
-% Sugestão de preenchimento: explicar brevemente as etapas:
-% Edição -> Síntese -> Simulação -> Place & Route -> Gravação.
+No Código \ref{cod:testbench_and}, o testbench cria sinais de entrada (\texttt{A} e \texttt{B}) e conecta a unidade sob teste (UUT - \textit{Unit Under Test}), que é a porta AND definida anteriormente. O processo dentro do testbench aplica diferentes combinações de entradas, aguardando 10 nanosegundos entre cada mudança, permitindo observar a saída \texttt{Y} em resposta às entradas. O resultado da simulação pode ser visualizado em uma forma de onda, facilitando a verificação do comportamento correto do circuito, como pode ser visto na Figura \ref{fig:onda_and}.
+
+\begin{figure}[htbp]
+    \centering
+    \caption{Forma de onda da simulação da porta AND}
+    \label{fig:onda_and}
+    \includegraphics[draft,width=0.7\textwidth]{onda_and.png}    
+\end{figure}
+
+Dessa forma, o VHDL vai possuir duas formas principais de uso:
+\begin{itemize}
+    \item \textbf{Síntese:} Onde o código VHDL é infere o circuito lógico que será implementado no PLD.
+    \item \textbf{Simulação:} Onde o código VHDL é utilizado para validar o comportamento do circuito antes da síntese.
+\end{itemize}
+
+Essas duas vertentes são fundamentais no fluxo de projeto digital, garantindo que o design atenda aos requisitos funcionais e de desempenho antes da implementação física. No entando, cada uma dessas vertentes possui suas próprias regras e boas práticas de codificação, que serão abordadas nos capítulos seguintes. Isso acontece porque certos construtos do VHDL são adequados para simulação, mas não para síntese, e vice-versa. Por exemplo, estruturas como \texttt{wait} e \texttt{after} são úteis para simulação, mas não podem ser sintetizadas em hardware.
+
+\section{Histórico e Evolução da Linguagem VHDL}
+
+A linguagem VHDL (\textit{VHSIC Hardware Description Language}) possui uma origem distinta da maioria das linguagens de programação de software, tendo sido concebida inicialmente não para a execução, mas para a documentação e preservação de projetos eletrônicos complexos.
+
+\subsection{Origens e o Programa VHSIC (Década de 1980)}
+No início da década de 1980, o Departamento de Defesa dos Estados Unidos (DoD) enfrentava uma crise logística relacionada ao ciclo de vida de seus componentes eletrônicos. Com o avanço rápido da tecnologia, chips utilizados em equipamentos militares tornavam-se obsoletos rapidamente, e a falta de documentação padronizada impedia a reprodução desses componentes por novos fabricantes.
+
+% Referência: Department of Defense. "Requirements for Hardware Description Languages". United States, 1981.
+% Referência: Dewey, A. "VHSIC Hardware Description Language (VHDL) Development Program". Proceedings of the 20th Design Automation Conference, 1983.
+
+Para solucionar este problema, o DoD iniciou o programa VHSIC (\textit{Very High Speed Integrated Circuits}). O objetivo era criar uma linguagem agnóstica de tecnologia que pudesse descrever o comportamento e a estrutura de circuitos integrados. Em 1983, um contrato foi firmado com a Intermetrics, IBM e Texas Instruments para desenvolver a primeira versão da linguagem. Uma decisão crucial de design foi basear a sintaxe na linguagem Ada, herdando desta a tipagem forte e a não-sensibilidade a letras maiúsculas/minúsculas, visando reduzir erros de ambiguidade em projetos críticos.
+
+% Referência: IEEE Solid-State Circuits Society. "The Roots of VHDL". IEEE SSCS Magazine, 2018.
+
+\subsection{Padronização e Evolução (IEEE)}
+Embora criada para documentação, os engenheiros perceberam rapidamente que uma descrição comportamental precisa poderia ser executada por softwares de simulação. Para fomentar a adoção pela indústria civil e garantir a interoperabilidade entre ferramentas de CAD (\textit{Computer-Aided Design}), o DoD transferiu os direitos da linguagem para o IEEE (\textit{Institute of Electrical and Electronics Engineers}) em 1986.
+
+O primeiro padrão oficial foi publicado como \textbf{IEEE Standard 1076-1987} (conhecido como VHDL-87). Desde então, a linguagem passou por revisões periódicas para incorporar novas capacidades de síntese e verificação:
+
+\begin{itemize}
+    \item \textbf{VHDL-93:} Introduziu uma sintaxe mais consistente, identificadores estendidos e melhorias na manipulação de arquivos.
+    \item \textbf{IEEE 1164:} Embora não seja uma revisão da linguagem em si, a padronização do pacote \texttt{std\_logic\_1164} foi um marco fundamental. Ela introduziu o sistema lógico de 9 valores (incluindo 'Z' para alta impedância e 'X' para desconhecido), permitindo a modelagem realista de circuitos digitais.
+    \item \textbf{VHDL-2000 e 2002:} Pequenas revisões que adicionaram o modificador \texttt{protected} para tipos.
+    \item \textbf{VHDL-2008 (IEEE 1076-2008):} Uma grande modernização que incorporou recursos inspirados em SystemVerilog, facilitando a verificação e reduzindo a verbosidade do código para operações comuns.
+    \item \textbf{VHDL-2019:} A iteração mais recente, focada em melhorias para interfaces de verificação e introspecção de tipos.
+\end{itemize}
+
+% Referência: IEEE Standard 1076-2008. "IEEE Standard VHDL Language Reference Manual". IEEE Computer Society, 2009.
+% Referência: Ashenden, Peter J. "The Designer's Guide to VHDL". Morgan Kaufmann, 3rd Edition, 2008.
+
+\subsection{Estado da Arte e Aplicação Atual}
+Atualmente, o VHDL é uma das linguagens dominantes no design de hardware digital, dividindo o mercado global com o Verilog/SystemVerilog. Sua aplicação primordial migrou da documentação para a \textbf{síntese lógica} e a \textbf{simulação}.
+
+O VHDL é amplamente empregado no desenvolvimento de FPGAs (\textit{Field-Programmable Gate Arrays}) e ASICs (\textit{Application-Specific Integrated Circuits}). Devido à sua natureza fortemente tipada e determinística, o VHDL mantém uma forte preferência em setores que exigem alta confiabilidade e segurança crítica, como as indústrias aeroespacial, automotiva, médica e de defesa, especialmente na Europa e nas Américas. Ferramentas modernas de síntese da Intel (Quartus) e AMD/Xilinx (Vivado) oferecem suporte abrangente aos padrões mais recentes, permitindo que a linguagem descreva desde portas lógicas simples até processadores \textit{soft-core} complexos e aceleradores de inteligência artificial.
+
+% Referência: Chu, Pong P. "FPGA Prototyping by VHDL Examples". Wiley-Interscience, 2008.
+% Referência: Doulos. "VHDL History and Evolution". Doulos Technical Articles, Web Resources.
