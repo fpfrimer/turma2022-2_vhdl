@@ -1,0 +1,98 @@
+% Capítulo intordutório sobre VHDL
+\chapter{Introdução}
+
+Esta apostila apresenta conceitos fundamentais de VHDL utilizados na disciplina, introduzindo a base tecnológica e a linguagem de descrição.
+
+\section{O que são Dispositivos Lógicos Programáveis?}
+
+Em um futuro distante, um marceneiro chega ao seu galpão para mais um dia de trabalho. No interior do espaço, repousam alguns cubos perfeitos — cada um com exato um metro de lado — feitos de um material misterioso. O marceneiro pega um desses cubos, leva-o ao centro do galpão e, com um pequeno dispositivo em mãos, emite comandos que dão vida à matéria inerte. Diante de seus olhos, o cubo se reconfigura: transforma-se primeiro em uma mesa robusta, depois em uma cadeira ergonômica, em seguida em uma estante organizada — tudo de acordo com a necessidade daquele momento.
+
+O segredo está na divisão de tarefas: o dispositivo armazena os \textit{blueprints} (os planos detalhados de cada móvel), enquanto o cubo é feito de um material inteligente, capaz de se moldar dinamicamente, respeitando apenas os limites de sua massa e volume.
+
+Embora soe como ficção científica, essa metáfora ilustra o funcionamento dos \textbf{Dispositivos Lógicos Programáveis} (PLDs – \textit{Programmable Logic Devices}): componentes eletrônicos cuja arquitetura interna pode ser configurada pelo usuário para executar funções lógicas específicas, simplesmente carregando um novo “projeto” — ou seja, um novo arquivo de configuração.
+
+No contexto dos PLDs, o ``material inteligente'' é representado por uma matriz de blocos lógicos e interconexões programáveis. Esses blocos podem ser configurados para realizar operações lógicas variadas, enquanto as interconexões permitem que os blocos se comuniquem, formando circuitos complexos. O \textit{blueprint}, por sua vez, representa o projeto digital. Esse projeto pode ser descrito tanto por diagramas esquemáticos quanto por \textbf{Linguagens de Descrição de Hardware} (HDLs).
+
+Existem diversas categorias de PLDs. Entre as mais comuns estão os \textbf{FPGAs} (\textit{Field-Programmable Gate Arrays}) e os \textbf{CPLDs} (\textit{Complex Programmable Logic Devices}). Os FPGAs são conhecidos por sua alta densidade lógica e flexibilidade, permitindo a implementação de sistemas digitais complexos. Já os CPLDs costumam ser mais simples, possuem arquitetura menos granular e são ideais para lógicas de controle e aplicações que exigem previsibilidade temporal rigorosa.
+
+\section{Linguagens de Descrição de Hardware}
+
+Uma HDL (\textit{Hardware Description Language}) \textbf{não é uma linguagem de programação}. Como o próprio nome sugere, trata-se de uma linguagem utilizada para \textbf{descrever} o hardware. Diferentemente das linguagens de software (como C ou Python), que geram instruções sequenciais para um processador, as HDLs permitem que engenheiros definam a estrutura e o comportamento de circuitos eletrônicos, onde muitas coisas acontecem simultaneamente (concorrência).
+
+Atualmente, as HDLs mais populares para configurar PLDs são o \textbf{VHDL} (\textit{VHSIC Hardware Description Language}), o \textbf{Verilog} e o \textbf{SystemVerilog}. Todas permitem a descrição de circuitos em diferentes níveis de abstração, desde o comportamental (o que o circuito faz) até o estrutural (quais portas lógicas compõem o circuito). Esta apostila foca no uso do \textbf{VHDL}.
+
+\section{O que é VHDL?}
+
+A sigla VHDL significa \textbf{VHSIC Hardware Description Language}, onde VHSIC é o acrônimo para \textit{Very High Speed Integrated Circuit}. Desenvolvida na década de 1980 pelo Departamento de Defesa dos Estados Unidos, a linguagem foi criada para documentar e simular o comportamento de circuitos integrados complexos. Com o tempo, o VHDL evoluiu e se tornou um padrão internacional (IEEE 1076), amplamente adotado na indústria eletrônica para o design de sistemas digitais.
+
+Para exemplificar, considere o trecho o código \ref{cod:porta_and} escrito em VHDL, que descreve uma porta AND de duas entradas. Não se preocupe em entender todos os detalhes agora; o objetivo é apenas ilustrar a estrutura básica de um arquivo VHDL.
+
+\begin{code}
+\caption{Exemplo de uma porta AND em VHDL}
+\label{cod:porta_and}
+\begin{lstlisting}
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity AND2 is
+    port (
+        A, B : in  std_logic;
+        Y    : out std_logic
+    );
+end AND2;
+
+architecture rtl of AND2 is
+begin
+    Y <= A and B;
+end rtl;
+\end{lstlisting}
+\end{code}
+
+Observe no Código \ref{cod:porta_and} a estrutura básica de um arquivo VHDL:
+
+\begin{itemize}
+    \item \textbf{Bibliotecas:} As linhas iniciais importam a biblioteca \texttt{ieee}, necessária para usar o tipo de dado padrão \texttt{std\_logic}.
+    \item \textbf{Entidade (Entity):} Define a interface do componente, ou seja, suas entradas (\texttt{A}, \texttt{B}) e saídas (\texttt{Y}). É a "caixa preta" vista de fora.
+    \item \textbf{Arquitetura (Architecture):} Descreve o comportamento interno. Neste caso, a saída \texttt{Y} recebe o resultado da operação lógica AND entre \texttt{A} e \texttt{B}.
+\end{itemize}
+
+Além da descrição para síntese (criação do circuito físico), o VHDL é amplamente utilizado para \textbf{simulação}. Isso permite que os desenvolvedores validem o comportamento do circuito no computador antes de implementá-lo no PLD, economizando tempo e garantindo a confiabilidade do projeto.
+
+O código a seguir apresenta um exemplo simples de testbench em VHDL, utilizado para simular o comportamento da porta AND definida no Código \ref{cod:porta_and}.
+
+\begin{code}
+\caption{Exemplo de Testbench para a porta AND}
+\label{cod:testbench_and}
+\begin{lstlisting}
+library ieee;
+use ieee.std_logic_1164.all;    
+use ieee.numeric_std.all;
+entity tb_AND2 is
+end tb_AND2;
+architecture behavior of tb_AND2 is
+    signal A, B : std_logic := '0';
+    signal Y    : std_logic;
+    
+    component AND2
+        port (
+            A, B : in  std_logic;
+            Y    : out std_logic
+        );
+    end component;
+begin
+    uut: AND2 port map (A => A, B => B, Y => Y);   
+    process
+    begin
+        A <= '0'; B <= '0'; wait for 10 ns;
+        A <= '0'; B <= '1'; wait for 10 ns;
+        A <= '1'; B <= '0'; wait for 10 ns;
+        A <= '1'; B <= '1'; wait for 10 ns;
+        wait;
+    end process;    
+end behavior;
+\end{lstlisting}    
+\end{code}
+
+\section{Fluxo de Projeto (Design Flow)}
+% Sugestão de preenchimento: explicar brevemente as etapas:
+% Edição -> Síntese -> Simulação -> Place & Route -> Gravação.

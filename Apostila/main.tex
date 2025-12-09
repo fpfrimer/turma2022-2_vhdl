@@ -1,0 +1,105 @@
+\documentclass[12pt,a4paper]{book}
+
+% ------------------------------------------------------------
+% Pacotes gerais
+% ------------------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amsmath, amssymb}
+\usepackage{lipsum}
+
+% ------------------------------------------------------------
+% Pacotes para código
+% ------------------------------------------------------------
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}   % Necessário para definir floats novos
+
+% ------------------------------------------------------------
+% Estilo de código VHDL
+% ------------------------------------------------------------
+\lstdefinelanguage{VHDL}{
+  morekeywords={
+    library,use,all,entity,is,port,in,out,end,architecture,of,
+    begin,and,or,not,signal,process,if,then,else,elsif,when,
+    others,downto,to
+  },
+  sensitive=false,
+  morecomment=[l]--,
+  morestring=[b]"
+}
+
+\lstset{
+  language=VHDL,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{red!70!black},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=8pt,
+  tabsize=2,
+  showstringspaces=false,
+  breaklines=true
+}
+
+% ------------------------------------------------------------
+% Ambiente code (float)
+% ------------------------------------------------------------
+\floatstyle{ruled}
+\newfloat{code}{htbp}{loc}[section]
+\floatname{code}{Código}
+
+% ------------------------------------------------------------
+\title{Apostila de Lógica Reconfigurável com VHDL:\\Fundamentos e Aplicações}
+\author{Prof. Felipe Walter Dafico Pfrimer}
+\date{\today}
+
+\begin{document}
+\frontmatter
+\maketitle
+
+\tableofcontents
+\newpage
+
+\mainmatter
+
+\input{Caps/cap01intro.tex}
+
+\chapter{Introdução}
+Esta apostila apresenta conceitos fundamentais de VHDL utilizados na disciplina.
+
+\section{Primeiro Exemplo}
+A seguir temos um exemplo simples de entidade e arquitetura em VHDL.
+
+\begin{code}
+\caption{Exemplo de entidade e arquitetura}
+\label{cod:entidade}
+\begin{lstlisting}
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity AND2 is
+    port (
+        A, B : in  std_logic;
+        Y    : out std_logic
+    );
+end AND2;
+
+architecture rtl of AND2 is
+begin
+    Y <= A and B;
+end rtl;
+\end{lstlisting}
+\end{code}
+
+Podemos referenciar o código acima como Código~\ref{cod:entidade}.
+
+\section{Conclusão}
+\lipsum[1]
+
+\end{document}
