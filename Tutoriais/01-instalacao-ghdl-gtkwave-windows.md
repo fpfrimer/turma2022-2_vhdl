@@ -36,7 +36,21 @@ pacman -Su
 
 ---
 
-## Passo 3: Instalar o GHDL
+## Passo 3: Adicionar ao PATH do Windows (Opcional)
+
+Para usar os comandos `ghdl` e `gtkwave` em qualquer terminal do Windows:
+
+1. Abra o **Painel de Controle** → **Sistema** → **Configurações Avançadas do Sistema**
+2. Clique em **Variáveis de Ambiente**
+3. Em **Variáveis do sistema**, selecione `Path` e clique em **Editar**
+4. Clique em **Novo** e adicione:
+   - `C:\msys64\mingw64\bin`
+5. Clique em **OK** em todas as janelas
+6. Reinicie o terminal/PowerShell
+
+---
+
+## Passo 4: Instalar o GHDL
 
 Ainda no terminal do MSYS2, instale o GHDL com o seguinte comando:
 
@@ -60,7 +74,7 @@ Compiled with mcode code generator
 
 ---
 
-## Passo 4: Instalar o GTKWave
+## Passo 5: Instalar o GTKWave
 
 No mesmo terminal, instale o GTKWave:
 
@@ -77,20 +91,6 @@ gtkwave --version
 ```
 
 Você deve ver a versão do GTKWave instalada.
-
----
-
-## Passo 5: Adicionar ao PATH do Windows (Opcional)
-
-Para usar os comandos `ghdl` e `gtkwave` em qualquer terminal do Windows:
-
-1. Abra o **Painel de Controle** → **Sistema** → **Configurações Avançadas do Sistema**
-2. Clique em **Variáveis de Ambiente**
-3. Em **Variáveis do sistema**, selecione `Path` e clique em **Editar**
-4. Clique em **Novo** e adicione:
-   - `C:\msys64\mingw64\bin`
-5. Clique em **OK** em todas as janelas
-6. Reinicie o terminal/PowerShell
 
 ---
 
