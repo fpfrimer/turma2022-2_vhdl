@@ -13,7 +13,7 @@ package display is
 	
 	-- Define um vetor de vetores de 7 bits para múltiplos displays de 7 segmentos
 	type display_vector is array(natural range <>) of std_logic_vector(0 to 6);
-
+	
 	-- Declara a função que converte um número hexadecimal em sinais de controle para o display
 	function seven_segment_decode (hex_num : in std_logic_vector(3 downto 0); mode : in display_type) return std_logic_vector;
 
