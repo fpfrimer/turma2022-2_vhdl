@@ -3,10 +3,10 @@
 -- de 4 a 0 no console de simulação. Este exemplo ajuda a entender como controlar o fluxo de execução
 -- com loops em VHDL e como utilizar o comando 'report' para visualizar valores durante a simulação.
 
-entity a003b_for_loop_tb is
+entity a003e_for_loop_tb is
 end entity;
 
-architecture sim of a003b_for_loop_tb is
+architecture sim of a003e_for_loop_tb is
 begin
 
     -- Thread

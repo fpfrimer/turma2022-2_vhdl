@@ -3,10 +3,10 @@
 -- Esta abordagem demonstra como controlar a execução de loops usando condições de saída.
 
 
-entity a003e_while_loop_tb is
+entity a003h_while_loop_tb is
 end entity;
 
-architecture sim of a003e_while_loop_tb is
+architecture sim of a003h_while_loop_tb is
     constant n  :   integer := 9; -- Declara a constante 'n' com o valor 9 para uso como condição de saída do loop.
 begin
 

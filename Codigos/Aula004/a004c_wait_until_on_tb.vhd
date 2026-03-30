@@ -4,11 +4,11 @@
 -- O comando 'wait until', por sua vez, permite a pausa de um processo até que uma condição definida seja verdadeira,
 -- sendo útil para sincronizar ações dentro de um circuito conforme estados específicos são alcançados.
 
-entity a004b_wait_until_on_tb is
+entity a004c_wait_until_on_tb is
 end entity;
 
 -- Arquitetura que inclui sinais e processos que ilustram como os comandos 'wait on' e 'wait until' funcionam.
-architecture sim of a004b_wait_until_on_tb is
+architecture sim of a004c_wait_until_on_tb is
     -- Declaração dos sinais usados para demonstrar os comandos de espera.
     signal CntUp    :   integer := 0;  -- Contador que incrementa a partir de 0.
     signal CntDown  :   integer := 10; -- Contador que decrementa a partir de 10.

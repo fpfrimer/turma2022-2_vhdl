@@ -4,10 +4,10 @@
 -- valor de 10. A cada iteração, o valor atual da variável é impresso, seguido de 
 -- uma espera de 20 nanossegundos, ilustrando o controle temporal em processos VHDL.
 
-entity a003a_loop_tb is
+entity a003d_loop_tb is
 end entity;
 
-architecture sim of a003a_loop_tb is
+architecture sim of a003d_loop_tb is
 begin
 
     -- O processo dentro da arquitetura simula uma thread de execução.

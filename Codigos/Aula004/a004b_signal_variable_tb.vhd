@@ -3,13 +3,13 @@
 -- funcionam como conexões físicas e podem interconectar componentes ou processos, variáveis são 
 -- usadas internamente dentro de processos para armazenar dados temporários e são atualizadas 
 --instantaneamente.
--- Os outros dois tipos de objetos em VHDL são constantes, que armazenam valores que não mudam, 
+-- Os outros dois tipos de objetos em VHDL são constantes, que armazenam valores que não mudam,
 -- e arquivos, usados para operações de entrada e saída.
 
-entity a004a_signal_variable_tb is
+entity a004b_signal_variable_tb is
 end entity;
 
-architecture sim of a004a_signal_variable_tb is
+architecture sim of a004b_signal_variable_tb is
     signal mysignal : integer := 0;
 begin
     process is

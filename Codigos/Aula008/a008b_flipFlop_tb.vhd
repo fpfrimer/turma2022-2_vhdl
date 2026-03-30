@@ -1,4 +1,17 @@
- -- Parâmetros de clock para o testbench
+ -- Este arquivo VHDL é o banco de testes para o módulo flip-flop D.
+-- Ele configura um ambiente de simulação que testa o comportamento do flip-flop
+-- gerando um sinal de clock e reset assíncrono, aplicando estímulos na entrada D
+-- e verificando a saída Q em resposta às bordas de clock.
+
+library ieee;
+use ieee.std_logic_1164.all;      -- Inclui os tipos de lógica padrão.
+use ieee.numeric_std.all;         -- Inclui tipos e operações numéricas.
+
+entity a008b_flipFlop_tb is
+end entity;
+
+architecture sim of a008b_flipFlop_tb is
+    -- Parâmetros de clock para o testbench
     constant clkFreq : integer := 100e6;         -- Define a frequência de clock de 100 MHz
     constant clkPer  : time    := 1000 ms / clkFreq; -- Calcula o período do clock
 

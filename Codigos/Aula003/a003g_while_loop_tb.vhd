@@ -2,10 +2,10 @@
 -- A variável 'i' controla as iterações do loop e é inicializada em 0. Este exemplo é útil para aprender como controlar
 -- fluxos de execução usando loops em VHDL e como variáveis são declaradas e utilizadas dentro de processos.
 
-entity a003d_while_loop_tb is
+entity a003g_while_loop_tb is
 end entity;
 
-architecture sim of a003d_while_loop_tb is
+architecture sim of a003g_while_loop_tb is
 begin
 
     -- Define um único processo chamado 'imprime_pares'
