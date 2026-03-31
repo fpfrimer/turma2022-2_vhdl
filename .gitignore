@@ -44,3 +44,12 @@ vsim.wlf
 **/.svn/
 **/CVS/
 *.svnignore
+
+# Ignorar arquivos gerados pelo ghdl e gtkwave
+*.ghw
+*.vcd
+*.gtkw
+*.exe
+*.o
+*.cf
+
