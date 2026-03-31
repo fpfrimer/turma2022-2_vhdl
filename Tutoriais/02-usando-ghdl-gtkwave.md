@@ -462,6 +462,63 @@ chmod +x run_sim.sh
 
 ---
 
+## Controlando o Tempo de Simulação
+
+### Limitando o Tempo de Simulação
+
+Por padrão, o GHDL executa a simulação até que não haja mais eventos ou até encontrar um `wait` infinito. Para limitar o tempo de simulação, use a opção `--stop-time`:
+
+```bash
+# Simular por 100 nanossegundos
+ghdl -r tb_portas --stop-time=100ns --vcd=portas.vcd
+
+# Simular por 1 microssegundo
+ghdl -r tb_portas --stop-time=1us --vcd=portas.vcd
+
+# Simular por 500 nanossegundos
+ghdl -r tb_contador --stop-time=500ns --vcd=contador.vcd
+```
+
+**Unidades de tempo suportadas:**
+- `fs` - femtossegundos (10⁻¹⁵ s)
+- `ps` - picossegundos (10⁻¹² s)
+- `ns` - nanossegundos (10⁻⁹ s)
+- `us` - microssegundos (10⁻⁶ s)
+- `ms` - milissegundos (10⁻³ s)
+- `sec` - segundos
+
+### Exemplo Prático: Contador com Tempo Limitado
+
+Para o exemplo do contador, você pode limitar a simulação para ver apenas os primeiros ciclos:
+
+```bash
+# Ver apenas os primeiros 200ns (suficiente para ver algumas contagens)
+ghdl -r tb_contador --stop-time=200ns --vcd=contador_curto.vcd
+gtkwave contador_curto.vcd
+
+# Ver simulação completa até overflow e além
+ghdl -r tb_contador --stop-time=1us --vcd=contador_completo.vcd
+gtkwave contador_completo.vcd
+```
+
+### Dica: Ver Ajuda das Opções de Simulação
+
+Para listar todas as opções disponíveis para simulação:
+
+```bash
+ghdl -r nome_do_testbench --help
+```
+
+Isso mostrará opções como:
+- `--stop-time=X` - parar simulação no tempo X
+- `--stop-delta=X` - parar após X deltas
+- `--vcd=FILENAME` - gerar arquivo VCD
+- `--fst=FILENAME` - gerar arquivo FST (mais rápido)
+- `--trace-signals` - mostrar sinais após cada ciclo
+- `--stats` - mostrar estatísticas de execução
+
+---
+
 ## Comandos Úteis do GHDL
 
 | Comando | Descrição |
@@ -470,6 +527,8 @@ chmod +x run_sim.sh
 | `ghdl -e entidade` | Elabora (linka) uma entidade |
 | `ghdl -r entidade` | Executa a simulação |
 | `ghdl -r entidade --vcd=saida.vcd` | Executa e gera waveform |
+| `ghdl -r entidade --stop-time=100ns` | Limita simulação a 100ns |
+| `ghdl -r entidade --help` | Mostra opções de simulação |
 | `ghdl --help` | Mostra ajuda completa |
 | `ghdl --version` | Mostra versão instalada |
 
