@@ -28,9 +28,13 @@ Confirme a instalação pressionando `Enter` quando solicitado.
 
 ### Passo 4: Verificar a instalação
 
+Se você inseriu o caminho do MSYS2 no PATH do Windows, pode verificar a instalação do Make no PowerShell:
+
 ```bash
-make --version
+mingw32-make --version
 ```
+
+Obs.: Esse comando não irá funcionar no terminal do MSYS2.
 
 Deve aparecer algo como:
 
@@ -56,7 +60,15 @@ O caminho padrão de instalação do Make é:
 C:\msys64\mingw64\bin\mingw32-make.exe
 ```
 
-Verifique se o executável está nesse caminho. Este será o caminho usado para criar o link simbólico.
+Para o terminal do MSYS2, o caminho correspondente é:
+
+```
+/mingw64/bin/mingw32-make.exe
+```
+
+Pois a raiz do MSYS2 é mapeada para `C:\msys64`.
+
+Verifique se o arquivo `C:\msys64\mingw64\bin\mingw32-make.exe` existe. Este será o caminho usado para criar o link simbólico.
 
 ### Passo 2: Criar o link simbólico (via MSYS2)
 
@@ -71,6 +83,8 @@ Este comando cria um link simbólico chamado `make.exe` que aponta para `mingw32
 **Nota:** O comando `ln -s` do MSYS2 cria links simbólicos sem necessidade de privilégios de administrador.
 
 ### Passo 3: Verificar o link
+
+No powershell, execute:
 
 ```bash
 make --version
@@ -92,30 +106,34 @@ Um **Makefile** define regras para automatizar a compilação e simulação.
 # Variáveis
 GHDL = ghdl
 GTKWAVE = gtkwave
+TESTBENCH = tb_design
+DESIGN = design.vhd
 
 # Alvo padrão
 all: simulate
 
 # Regra de análise (compilação)
-analyze: design.vhd tb_design.vhd
-	$(GHDL) -a design.vhd
-	$(GHDL) -a tb_design.vhd
+analyze: $(DESIGN) $(TESTBENCH)
+	$(GHDL) -a $(DESIGN).vhd
+	$(GHDL) -a $(TESTBENCH).vhd
 
 # Regra de elaboração
 elaborate: analyze
-	$(GHDL) -e tb_design
+	$(GHDL) -e $(TESTBENCH)
 
 # Regra de simulação
 simulate: elaborate
-	$(GHDL) -r tb_design --vcd=design.vcd
+	$(GHDL) -r $(TESTBENCH) --vcd=$(DESIGN).vcd
 
 # Regra para visualizar
 view: simulate
-	$(GTKWAVE) design.vcd
+	$(GTKWAVE) $(DESIGN).vcd
 
 # Limpar arquivos gerados
+# Para Windows, use o comando abaixo para remover arquivos específicos
+# No linux, use "rm -f *.o *.vcd work-*.cf"
 clean:
-	powershell -Command "Get-ChildItem -Path *.exe, *.vcd,*.ghw,*.fst,*.o,work-*.cf -File | Remove-Item -ErrorAction SilentlyContinue"
+	powershell -Command "Get-ChildItem -Path *.exe, *.vcd,*.ghw,*.fst,*.o,work-*.cf -File | Remove-Item powershell -Command "Get-ChildItem -Path *.exe, *.vcd,*.ghw,*.fst,*.o,work-*.cf -File | Remove-Item -ErrorAction SilentlyContinue"-ErrorAction SilentlyContinue"
 
 # Declarar alvos como "falsos" (não são arquivos)
 .PHONY: all analyze elaborate simulate view clean

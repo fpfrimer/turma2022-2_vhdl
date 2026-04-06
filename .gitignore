@@ -53,3 +53,5 @@ vsim.wlf
 *.o
 *.cf
 
+Makefile
+
