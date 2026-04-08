@@ -1,7 +1,7 @@
 library ieee;                                  -- Importa a biblioteca padrão IEEE
 use ieee.std_logic_1164.all;                   -- Importa os tipos de sinais lógicos padrão (std_logic, etc.)
 
-entity blinker is
+entity a011c_block is
     port (
         clk : in std_logic;                    -- Sinal de clock de entrada
         sw 	: in std_logic_vector(1 downto 0); -- Vetor de switches para seleção de frequência
@@ -9,7 +9,7 @@ entity blinker is
     );
 end entity;
 
-architecture behavior of blinker is
+architecture behavior of a011c_block is
 
     -- define um array de inteiros (necessário no vhdl 1993)
 	type int_array is array(natural range <>) of integer range 1 to 31;

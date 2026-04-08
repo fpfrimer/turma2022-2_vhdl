@@ -1,8 +1,8 @@
 # Exercício: Gerador de Sinal UART para o Caractere 'a' em VHDL
 
-**Objetivo:** Desenvolva um testbench em VHDL que simule a transmissão de um caractere 'a' usando o protocolo UART (Universal Asynchronous Receiver/Transmitter) a uma taxa de 9600 bits por segundo. Ao mesmo tempo o mesmo testbench deve simular a transmissão o caractere 'A' a uma taxa de 115200 bits por segundo. O exercício deve incluir a geração de um bit de início, o envio dos bits de dados, e um bit de parada.
+**Objetivo:** Desenvolva um testbench em VHDL que simule a transmissão de um caractere 'a' usando o protocolo UART (Universal Asynchronous Receiver/Transmitter) a uma taxa de 9600 bits por segundo. Ao mesmo tempo o mesmo testbench deve simular a transmissão o caractere 'A' a uma taxa de 115200 bits por segundo. O exercício deve incluir a geração de um bit de início, o envio dos bits de dados, e um bit de parada. Utilize o tipo std_logic para a realização deste exercício.
 
-**Especificações:** Configure as transmissões para 8 bits de dados, sem paridade e um bit de parada. Utilize o `wait for` para simular o intervalo de tempo entre os bits transmitidos. O envio dos caracteres devem ocorrer a cada um segundo.
+**Especificações:** Configure as transmissões para 8 bits de dados, sem paridade e um bit de parada. Utilize o `wait for` para simular o intervalo de tempo entre os bits transmitidos. O envio dos caracteres devem ocorrer a cada um segundo. Utilize um sinal para sincronizar os envios a cada 1 s.
 
 **Dica:** Utilizar um processo para cada transmissão;
 

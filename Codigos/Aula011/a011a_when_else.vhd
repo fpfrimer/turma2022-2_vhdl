@@ -1,7 +1,7 @@
 library ieee;                                 
 use ieee.std_logic_1164.all;                   
 
-entity blinker is
+entity a011a_when_else is
     port (
         clk : in std_logic;                    -- Entrada do sinal de clock
         sw 	: in std_logic_vector(1 downto 0); -- Vetor de switches para seleção de frequência
@@ -9,7 +9,7 @@ entity blinker is
     );
 end entity;
 
-architecture behavior of blinker is
+architecture behavior of a011a_when_else is
 
     -- define um array de inteiros (necessário no vhdl 1993)
 	type int_array is array(natural range <>) of integer range 1 to 31;

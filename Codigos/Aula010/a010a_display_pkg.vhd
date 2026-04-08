@@ -30,7 +30,7 @@ package display is
 	function display(number : std_logic_vector; digits: positive; num_base : integer; mode : in display_type) return display_vector;
 	
 	-- Declaração do componente contador reutilizável
-	component counter is
+	component a010a_counter is
 		generic(
 			clk_freq		:	integer := 50e6;   -- Frequência do clock de entrada
 			update_freq		:	integer := 100;    -- Frequência de atualização do contador
@@ -42,7 +42,7 @@ package display is
 			en		:	in		std_logic;                             -- Habilita o contador
 			q		:	out 	unsigned(n_bits - 1 downto 0)         -- Saída com valor do contador
 		);
-	end component counter;
+	end component a010a_counter;
 
 end package;
 
@@ -179,7 +179,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity counter is
+entity a010a_counter is
 	generic(
 		clk_freq	:	integer := 50e6;  -- Frequência do clock em Hz
 		update_freq	:	integer := 100;   -- Frequência de atualização
@@ -191,9 +191,9 @@ entity counter is
 		en		:	in		std_logic;                         -- Habilitação do contador
 		q		:	out 	unsigned(n_bits - 1 downto 0)     -- Saída do contador
 	);
-end entity counter;
+end entity a010a_counter;
 
-architecture behavioral of counter is
+architecture behavioral of a010a_counter is
 	constant max	:	integer := clk_freq / update_freq; -- Número máximo de ciclos de clock antes de incrementar o contador
 begin
 	process(clk, nRst) is

@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;                  
 use ieee.numeric_std.all;                     
 
-entity blinker is
+entity a011f_if_generate is
     generic(
         n   : natural := 4                     -- Número de chaves de seleção
     );
@@ -13,7 +13,7 @@ entity blinker is
     );
 end entity;
 
-architecture behavior of blinker is
+architecture behavior of a011f_if_generate is
     
     -- define um array de inteiros (necessário no vhdl 1993)
 	type int_array is array(natural range <>) of integer range 1 to 31;
