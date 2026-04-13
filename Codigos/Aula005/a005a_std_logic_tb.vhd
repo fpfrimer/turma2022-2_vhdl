@@ -12,6 +12,7 @@ end entity;
 
 architecture sim of a005a_std_logic_tb is -- Define a arquitetura de simulação para o testbench.
     signal clock : std_logic := '0'; -- Inicia o sinal de clock em '0'.
+    signal reset : std_logic := '0'; 
     
 begin
     -- Processo que gera o sinal de clock.
@@ -21,4 +22,13 @@ begin
         clock <= not clock; -- Inverte o estado do sinal de clock, alternando entre '0' e '1'.
     end process;
     -- O processo é repetido indefinidamente, criando uma onda de clock de 20 ns de período (10 ns alto, 10 ns baixo).
+
+    process is
+    begin
+        wait for 25 ns; -- Espera por 25 nanosegundos.
+        reset <= '1'; -- Ativa o sinal de reset após 25 ns.
+        wait for 125 ns; -- Espera por mais 125 nanosegundos.
+        reset <= '0'; -- Desativa o sinal de reset após 150 ns.
+        wait; -- Aguarda indefinidamente, mantendo o processo ativo.
+    end process;
 end architecture;
