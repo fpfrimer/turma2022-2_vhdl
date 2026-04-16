@@ -29,7 +29,7 @@ architecture sim of a007e_generic_tb is
 
 begin
     -- Instanciação do mux genérico configurado com o parâmetro 'n'.
-    dut_mux: entity work.a007d_generic(rtl)
+    dut_mux: entity work.a007f_generic(rtl)
         generic map(dataWidth => n)
         port map(
             sel     =>      sel,

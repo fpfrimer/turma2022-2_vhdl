@@ -7,7 +7,7 @@ library ieee;
 use ieee.std_logic_1164.all; -- Inclui a biblioteca padrão para operações com std_logic e std_logic_vector.
 use ieee.numeric_std.all;    -- Inclui a biblioteca para operações com tipos aritméticos como 'unsigned'.
 
-entity a007d_generic is
+entity a007f_generic is
     generic(dataWidth : integer := 8); -- Parâmetro genérico que define a largura dos dados do mux.
     port(
         sig0, sig1, sig2, sig3  :   in  unsigned(dataWidth - 1 downto 0); -- Entradas do mux com largura parametrizada.
@@ -15,7 +15,7 @@ entity a007d_generic is
         saida                   :   out unsigned(dataWidth - 1 downto 0)); -- Saída do mux com largura parametrizada.
 end entity;
 
-architecture rtl of a007d_generic is
+architecture rtl of a007f_generic is
 begin
     -- Processo sensível aos sinais de entrada e ao sinal de seleção.
     process(sel, sig0, sig1, sig2, sig3) is
