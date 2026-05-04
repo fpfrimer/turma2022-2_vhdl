@@ -11,53 +11,87 @@
 % Ajuste de margens: 2 cm em todos os lados
 \usepackage[a4paper,margin=2.0cm]{geometry}
 \usepackage{amsmath, amssymb}
-\usepackage{lipsum}
 
 % ------------------------------------------------------------
 % Pacotes para código
 % ------------------------------------------------------------
 \usepackage{listings}
 \usepackage{xcolor}
-\usepackage{float}   % Necessário para definir floats novos
+\usepackage{tcolorbox}
 
 % ------------------------------------------------------------
 % Estilo de código VHDL
 % ------------------------------------------------------------
+\definecolor{codeback}{RGB}{248,248,248}
+\definecolor{codeframe}{RGB}{210,210,210}
+\definecolor{codekeyword}{RGB}{0,73,135}
+\definecolor{codetype}{RGB}{92,53,145}
+\definecolor{codecomment}{RGB}{100,100,100}
+\definecolor{codestring}{RGB}{0,110,80}
+\definecolor{boxback}{RGB}{245,249,252}
+\definecolor{boxframe}{RGB}{0,73,135}
+
 \lstdefinelanguage{VHDL}{
   morekeywords={
     library,use,all,entity,is,port,in,out,end,architecture,of,
     begin,and,or,not,signal,process,if,then,else,elsif,when,
-    others,downto,to
+    others,downto,to,component,port,map,
+    generic,constant,variable,wait,for,until,rising_edge,falling_edge,
+    case,loop,while,array,record,package,body,function,procedure
+  },
+  morekeywords=[2]{
+    boolean,bit,bit_vector,integer,natural,positive,real,time,
+    std_logic,std_logic_vector,signed,unsigned
   },
   sensitive=false,
   morecomment=[l]--,
   morestring=[b]"
 }
 
+\renewcommand{\lstlistingname}{Código}
+\renewcommand{\lstlistlistingname}{Lista de Códigos}
+
 \lstset{
   language=VHDL,
   basicstyle=\ttfamily\small,
-  keywordstyle=\color{blue},
-  commentstyle=\color{gray},
-  stringstyle=\color{red!70!black},
+  keywordstyle=\bfseries\color{codekeyword},
+  keywordstyle=[2]\color{codetype},
+  commentstyle=\itshape\color{codecomment},
+  stringstyle=\color{codestring},
+  backgroundcolor=\color{codeback},
+  frame=single,
+  rulecolor=\color{codeframe},
   numbers=left,
-  numberstyle=\tiny\color{gray},
+  numberstyle=\scriptsize\color{codecomment},
   stepnumber=1,
   % Ajustes para que os números de linha fiquem alinhados à margem
-  numbersep=5pt,
-  xleftmargin=15pt,
-  framexleftmargin=0pt,
+  numbersep=7pt,
+  xleftmargin=20pt,
+  framexleftmargin=18pt,
+  framextopmargin=4pt,
+  framexbottommargin=4pt,
   tabsize=2,
+  keepspaces=true,
+  columns=fullflexible,
   showstringspaces=false,
-  breaklines=true
+  breaklines=true,
+  breakatwhitespace=true,
+  captionpos=t
 }
 
-% ------------------------------------------------------------
-% Ambiente code (float)
-% ------------------------------------------------------------
-\floatstyle{ruled}
-\newfloat{code}{htbp}{loc}[section]
-\floatname{code}{Código}
+\newtcolorbox{observacao}[1]{
+  colback=boxback,
+  colframe=boxframe,
+  coltitle=white,
+  fonttitle=\bfseries,
+  title={#1},
+  arc=1mm,
+  boxrule=0.6pt,
+  left=6pt,
+  right=6pt,
+  top=5pt,
+  bottom=5pt
+}
 
 % ------------------------------------------------------------
 \title{Apostila de Lógica Reconfigurável com VHDL:\\Fundamentos e Aplicações}
@@ -74,37 +108,9 @@
 \mainmatter
 
 \input{Caps/cap01intro.tex}
+\input{Caps/cap02ferramentas.tex}
 
-\chapter{Introdução}
-Esta apostila apresenta conceitos fundamentais de VHDL utilizados na disciplina.
-
-\section{Primeiro Exemplo}
-A seguir temos um exemplo simples de entidade e arquitetura em VHDL.
-
-\begin{code}
-\caption{Exemplo de entidade e arquitetura}
-\label{cod:entidade}
-\begin{lstlisting}
-library ieee;
-use ieee.std_logic_1164.all;
-
-entity AND2 is
-    port (
-        A, B : in  std_logic;
-        Y    : out std_logic
-    );
-end AND2;
-
-architecture rtl of AND2 is
-begin
-    Y <= A and B;
-end rtl;
-\end{lstlisting}
-\end{code}
-
-Podemos referenciar o código acima como Código~\ref{cod:entidade}.
-
-\section{Conclusão}
-\lipsum[1]
+\bibliographystyle{plain}
+\bibliography{referencias}
 
 \end{document}

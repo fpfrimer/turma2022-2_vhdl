@@ -3,10 +3,28 @@
 \contentsline {section}{\numberline {1.1}O que são Dispositivos Lógicos Programáveis?}{1}{section.1.1}%
 \contentsline {section}{\numberline {1.2}Linguagens de Descrição de Hardware}{2}{section.1.2}%
 \contentsline {section}{\numberline {1.3}O que é VHDL?}{2}{section.1.3}%
-\contentsline {section}{\numberline {1.4}Histórico e Evolução da Linguagem VHDL}{4}{section.1.4}%
-\contentsline {subsection}{\numberline {1.4.1}Origens e o Programa VHSIC (Década de 1980)}{4}{subsection.1.4.1}%
-\contentsline {subsection}{\numberline {1.4.2}Padronização e Evolução (IEEE)}{5}{subsection.1.4.2}%
-\contentsline {subsection}{\numberline {1.4.3}Estado da Arte e Aplicação Atual}{5}{subsection.1.4.3}%
-\contentsline {chapter}{\numberline {2}Introdução}{7}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Primeiro Exemplo}{7}{section.2.1}%
-\contentsline {section}{\numberline {2.2}Conclusão}{7}{section.2.2}%
+\contentsline {section}{\numberline {1.4}Fluxo básico de projeto com VHDL}{4}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Ferramentas utilizadas na disciplina}{5}{subsection.1.4.1}%
+\contentsline {subsection}{\numberline {1.4.2}Próximos capítulos}{5}{subsection.1.4.2}%
+\contentsline {section}{\numberline {1.5}Perguntas para revisão}{5}{section.1.5}%
+\contentsline {section}{\numberline {1.6}Leitura complementar: histórico e evolução da linguagem VHDL}{6}{section.1.6}%
+\contentsline {subsection}{\numberline {1.6.1}Origens e o Programa VHSIC (Década de 1980)}{6}{subsection.1.6.1}%
+\contentsline {subsection}{\numberline {1.6.2}Padronização e Evolução (IEEE)}{6}{subsection.1.6.2}%
+\contentsline {subsection}{\numberline {1.6.3}Estado da Arte e Aplicação Atual}{7}{subsection.1.6.3}%
+\contentsline {chapter}{\numberline {2}Ferramentas e ambiente de desenvolvimento}{9}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Visão geral do ambiente}{10}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Organização dos arquivos de projeto}{10}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Instalação do Visual Studio Code}{10}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Configuração da extensão VHDL for Professionals}{10}{section.2.4}%
+\contentsline {section}{\numberline {2.5}Instalação do GHDL}{10}{section.2.5}%
+\contentsline {section}{\numberline {2.6}Primeira simulação com GHDL}{10}{section.2.6}%
+\contentsline {section}{\numberline {2.7}Instalação do VaporView}{10}{section.2.7}%
+\contentsline {section}{\numberline {2.8}Visualização de formas de onda}{10}{section.2.8}%
+\contentsline {section}{\numberline {2.9}Instalação do Quartus}{10}{section.2.9}%
+\contentsline {section}{\numberline {2.10}Criação de um projeto no Quartus}{10}{section.2.10}%
+\contentsline {section}{\numberline {2.11}Síntese e implementação no Quartus}{10}{section.2.11}%
+\contentsline {section}{\numberline {2.12}Gravação do projeto no FPGA}{10}{section.2.12}%
+\contentsline {section}{\numberline {2.13}Automação com Tcl}{10}{section.2.13}%
+\contentsline {section}{\numberline {2.14}Fluxo de trabalho recomendado}{10}{section.2.14}%
+\contentsline {section}{\numberline {2.15}Problemas comuns e verificação da instalação}{10}{section.2.15}%
+\contentsline {section}{\numberline {2.16}Perguntas para revisão}{10}{section.2.16}%
