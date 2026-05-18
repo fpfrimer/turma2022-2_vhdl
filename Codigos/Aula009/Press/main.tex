@@ -1,0 +1,948 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+% =========================================================
+% Apresentacao/apostila:
+% Subprogramas em VHDL: funcoes e procedimentos
+% Baseada nos arquivos da aula:
+% a009a_timer.vhd, a009b_timer_tb.vhd, a009c_timer_proc.vhd,
+% a009d_decod.vhd, a009e_timer_proc_top.vhd,
+% a009f_timer_proc_tb.vhd, a009g_lab_1.md, a009h_lab_2.md, a009j_vga.vhd
+%
+% O PDF subprogramas.pdf foi considerado apenas como apoio conceitual:
+% subprogramas, funcoes, procedimentos, modos de parametros e classes
+% de objetos.
+% =========================================================
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{upquote}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, fit}
+
+\usetheme{Boadilla}
+\usecolortheme{dolphin}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize items}[circle]
+\setbeamertemplate{enumerate items}[default]
+
+\definecolor{vhdlblue}{RGB}{26,74,138}
+\definecolor{vhdlgreen}{RGB}{30,120,70}
+\definecolor{vhdlgray}{RGB}{245,246,248}
+\definecolor{vhdlred}{RGB}{150,45,45}
+
+\lstdefinestyle{vhdlstyle}{
+    language=VHDL,
+    basicstyle=\ttfamily\scriptsize,
+    keywordstyle=\color{vhdlblue}\bfseries,
+    commentstyle=\color{vhdlgreen},
+    stringstyle=\color{vhdlred},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=6pt,
+    backgroundcolor=\color{vhdlgray},
+    frame=single,
+    rulecolor=\color{gray!35},
+    tabsize=4,
+    showstringspaces=false,
+    columns=fullflexible,
+    keepspaces=true,
+    breaklines=true,
+    captionpos=b,
+    xleftmargin=1.2em,
+    framexleftmargin=1.0em,
+    literate=
+        {á}{{\'a}}1 {à}{{\`a}}1 {ã}{{\~a}}1 {â}{{\^a}}1
+        {é}{{\'e}}1 {ê}{{\^e}}1
+        {í}{{\'i}}1
+        {ó}{{\'o}}1 {õ}{{\~o}}1 {ô}{{\^o}}1
+        {ú}{{\'u}}1
+        {ç}{{\c{c}}}1
+        {Á}{{\'A}}1 {Ã}{{\~A}}1
+        {É}{{\'E}}1
+        {Í}{{\'I}}1
+        {Ó}{{\'O}}1 {Õ}{{\~O}}1
+        {Ú}{{\'U}}1
+        {Ç}{{\c{C}}}1
+}
+\lstset{style=vhdlstyle}
+
+\title[Subprogramas em VHDL]{Subprogramas em VHDL}
+\subtitle{Funções e procedimentos aplicados a timers, displays e VGA}
+\author{Aula prática de VHDL}
+\institute{Base: arquivos \texttt{Aula009}}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Roteiro da aula}
+    \begin{enumerate}
+        \item Timer sem procedimento: onde aparece a repetição.
+        \item Testbench do timer: clock, reset e simulação rápida.
+        \item Timer com procedimento: reutilização da lógica de incremento.
+        \item Função para display de sete segmentos.
+        \item Integração no top-level para a DE10-Lite.
+        \item Exemplo VGA: procedimentos para varredura e desenho.
+        \item Labs e boas práticas.
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{O que são subprogramas em VHDL?}
+    Subprogramas são blocos de código nomeados que podem ser reutilizados dentro de uma arquitetura, pacote, processo ou outro escopo declarativo.
+
+    \vspace{0.5em}
+
+    Em VHDL, os dois tipos principais são:
+    \begin{itemize}
+        \item \textbf{Função}: calcula e retorna um único valor.
+        \item \textbf{Procedimento}: executa uma sequência de comandos e pode alterar sinais, variáveis ou produzir múltiplos resultados.
+    \end{itemize}
+
+    \vspace{0.5em}
+    Nesta aula, a ideia não é usar subprogramas por estilo, mas porque os exemplos mostram uma necessidade real: evitar repetição e deixar explícita a intenção do hardware descrito.
+\end{frame}
+
+\begin{frame}{Função ou procedimento?}
+    \begin{table}
+        \centering
+        \small
+        \renewcommand{\arraystretch}{1.35}
+        \setlength{\tabcolsep}{8pt}
+        \begin{tabular}{>{\bfseries}p{0.22\textwidth} p{0.29\textwidth} p{0.38\textwidth}}
+            \toprule
+            Critério & Função & Procedimento \\
+            \midrule
+            Resultado & Retorna um valor & Pode ter várias saídas \\
+            Uso típico & Expressões e conversões & Sequências reutilizáveis de comandos \\
+            Efeito esperado & Sem efeito colateral & Pode alterar sinais ou variáveis \\
+            Exemplo da aula & Decodificar um dígito & Incrementar contador com estouro \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+
+    \vspace{0.5em}
+    Regra prática: se a operação parece uma expressão, use função. Se parece uma pequena rotina de controle, use procedimento.
+
+    % Nota de fala: enfatizar que essa regra é didática. Em projetos maiores, a escolha também depende de estilo, pacotes e política de síntese.
+\end{frame}
+
+\begin{frame}[fragile]{Classes de objetos em parâmetros}
+    Em subprogramas, o parâmetro formal pode indicar a classe do objeto recebido. Funções normalmente usam entradas; procedimentos podem também alterar sinais ou variáveis.
+
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.47\textwidth}
+\textbf{Função}
+\begin{lstlisting}
+function decodificando(
+    valor : integer
+) return std_logic_vector is
+begin
+    -- calcula e retorna um valor
+end function;
+\end{lstlisting}
+\end{column}
+
+\begin{column}{0.50\textwidth}
+\textbf{Procedimento}
+\begin{lstlisting}
+procedure incrementa(
+    signal   contador : inout unsigned;
+    constant max      : in    positive;
+    constant habilita : in    boolean;
+    variable estouro  : out   boolean
+) is
+\end{lstlisting}
+\end{column}
+\end{columns}
+
+    \begin{itemize}
+        \item Em função, \texttt{valor : integer} significa \texttt{constant valor : in integer}; normalmente omitimos o padrão.
+        \item \texttt{variable} não pode ser usada como classe de parâmetro formal em funções.
+        \item \texttt{signal}: conectado a um sinal do circuito; atribuições usam \texttt{<=}.
+        \item Em procedimentos, \texttt{variable} é útil para resultado imediato dentro de um processo; atribuições usam \texttt{:=}.
+        \item \texttt{file}: existe em VHDL, mas é voltado a simulação e não é usado nestes exemplos.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Funções e procedimentos: modos}
+    Além da classe do objeto, o parâmetro tem um modo:
+
+    \begin{itemize}
+        \item \texttt{in}: o subprograma lê o valor.
+        \item \texttt{out}: o subprograma produz um valor.
+        \item \texttt{inout}: o subprograma lê o valor atual e também escreve um novo valor.
+    \end{itemize}
+
+    \vspace{0.5em}
+    Em uma \textbf{função}, os parâmetros são entradas e a saída principal é o \texttt{return}. Por isso ela combina bem com expressões, como o decodificador de sete segmentos.
+
+    \vspace{0.5em}
+    Em um \textbf{procedimento}, \texttt{out} e \texttt{inout} são naturais: é o caso de \texttt{incrementa}, que altera o contador e devolve a flag de estouro.
+\end{frame}
+
+\begin{frame}[fragile]{Chamar dentro ou fora de um process}
+    Dentro de um \texttt{process}, a chamada participa da sequência daquele processo. No timer, isso é essencial porque as chamadas acontecem na borda de clock.
+
+\begin{lstlisting}
+elsif falling_edge(clk) then
+    incrementa(ticks,  clockFreq, true, controle);
+    incrementa(segReg, 60, controle, controle);
+    incrementa(minReg, 60, controle, controle);
+    incrementa(horReg, 24, controle, controle);
+end if;
+\end{lstlisting}
+
+    Fora de um \texttt{process}, funções aparecem naturalmente em atribuições concorrentes:
+
+\begin{lstlisting}
+d0 <= decodificando(unidade);
+\end{lstlisting}
+
+    \vspace{0.2em}
+    Procedimentos também podem ter chamada concorrente em VHDL, mas em projetos didáticos e sintetizáveis costuma ser mais claro chamá-los dentro de processos.
+\end{frame}
+
+\section{Timer sem procedimento}
+
+\begin{frame}[fragile]{Exemplo inicial: timer sem procedimento}
+    O arquivo \texttt{a009a\_timer.vhd} descreve um timer com um contador interno de ticks e três contadores visíveis na interface.
+
+\begin{lstlisting}
+port(
+    clk  : in  std_logic;
+    nRst : in  std_logic;
+    s    : out unsigned(5 downto 0);
+    m    : out unsigned(5 downto 0);
+    h    : out unsigned(4 downto 0)
+);
+\end{lstlisting}
+
+\begin{lstlisting}
+architecture rtl of a009a_timer is
+    signal ticks  : unsigned(bits_necessarios(clockFreq) - 1 downto 0) := (others => '0');
+    signal segReg : unsigned(5 downto 0) := (others => '0');
+    -- minReg e horReg seguem a mesma ideia
+begin
+    -- logica sequencial do timer
+\end{lstlisting}
+
+    \vspace{0.2em}
+    \texttt{ticks} pertence à arquitetura: divide o clock até formar 1 segundo. Já \texttt{s}, \texttt{m} e \texttt{h} são portas \texttt{out}, conectáveis ao testbench, ao top-level ou aos displays.
+\end{frame}
+
+\begin{frame}[fragile]{Reset e contador de ticks}
+    O processo primeiro trata o reset assíncrono ativo em nível baixo. Depois, a cada borda de descida, \texttt{ticks} transforma ciclos de clock em segundos.
+
+\begin{lstlisting}
+if nRst = '0' then
+    ticks  <= (others => '0');
+    segReg <= (others => '0');
+    minReg <= (others => '0');
+    horReg <= (others => '0');
+
+elsif falling_edge(clk) then
+    if ticks = to_unsigned(clockFreq - 1, ticks'length) then
+        ticks <= (others => '0');
+        -- aqui entram segundos, minutos e horas
+    else
+        ticks <= ticks + 1;
+    end if;
+end if;
+\end{lstlisting}
+
+    \vspace{0.5em}
+    Em simulação, \texttt{clockFreq} pode ser pequeno, como 10 Hz. No hardware real da DE10-Lite, o clock principal é de 50 MHz.
+\end{frame}
+
+\begin{frame}[fragile]{Incremento em cascata}
+    Quando \texttt{ticks} estoura, o timer incrementa segundos. Se segundos estouram, incrementa minutos. Se minutos estouram, incrementa horas.
+
+\begin{lstlisting}
+if segReg = to_unsigned(59, segReg'length) then
+    segReg <= (others => '0');
+
+    if minReg = to_unsigned(59, minReg'length) then
+        minReg <= (others => '0');
+
+        if horReg = to_unsigned(23, horReg'length) then
+            horReg <= (others => '0');
+        else
+            horReg <= horReg + 1;
+        end if;
+    else
+        minReg <= minReg + 1;
+    end if;
+else
+    segReg <= segReg + 1;
+end if;
+\end{lstlisting}
+
+    \vspace{0.4em}
+    A estrutura funciona, mas o padrão ``incrementa ou volta para zero'' aparece várias vezes.
+\end{frame}
+
+\begin{frame}{O que este código nos ensina?}
+    O timer sem procedimento é um bom primeiro passo porque deixa a lógica visível:
+    \begin{itemize}
+        \item existe um contador base;
+        \item cada contador possui um limite;
+        \item ao chegar ao limite, ele volta para zero;
+        \item o estouro de um contador habilita o próximo.
+    \end{itemize}
+
+    \vspace{0.5em}
+    A motivação para o procedimento nasce daqui: a lógica de incremento com estouro é a mesma para \texttt{ticks}, \texttt{s}, \texttt{m} e \texttt{h}; mudam apenas o limite e a condição de habilitação.
+
+    % Nota de fala: pedir aos alunos para identificarem "o algoritmo repetido" antes de mostrar o procedimento.
+\end{frame}
+
+
+\section{Testbench do timer}
+
+\begin{frame}[fragile]{Testbench do timer}
+    O arquivo \texttt{a009b\_timer\_tb.vhd} instancia o timer original e reduz a frequência para tornar a simulação curta.
+
+\begin{lstlisting}
+constant clockFreq : positive := 10;
+constant clkPer    : time := 1000 ms / clockFreq;
+
+signal clk, nRst : std_logic := '0';
+signal segundo   : unsigned(5 downto 0);
+signal minuto    : unsigned(5 downto 0);
+signal hora      : unsigned(4 downto 0);
+\end{lstlisting}
+
+    \vspace{0.4em}
+    Em vez de esperar 50 milhões de ciclos para ver um segundo passar, o testbench usa 10 ciclos por segundo simulado e verifica automaticamente o primeiro transbordo de segundos para minutos.
+\end{frame}
+
+\begin{frame}[fragile]{Instanciação do DUT}
+    O DUT é o \textit{device under test}: o circuito que queremos exercitar na simulação.
+
+\begin{lstlisting}
+i_timer: entity work.a009a_timer(rtl)
+    generic map (
+        clockFreq => clockFreq
+    )
+    port map (
+        clk  => clk,
+        nRst => nRst,
+        s    => segundo,
+        m    => minuto,
+        h    => hora
+    );
+\end{lstlisting}
+
+    \vspace{0.4em}
+    O \texttt{generic map} troca o valor padrão do projeto por um valor adequado à simulação.
+\end{frame}
+
+\begin{frame}[fragile]{Clock e reset no testbench}
+    O clock é gerado por uma atribuição concorrente. O reset começa ativo e depois é liberado.
+
+\begin{lstlisting}
+clk <= not clk after clkPer / 2;
+
+process is
+begin
+    wait until rising_edge(clk);
+    wait until rising_edge(clk);
+
+    nRst <= '1';
+
+    wait;
+end process;
+\end{lstlisting}
+
+    \vspace{0.4em}
+    Mesmo que o DUT use \texttt{falling\_edge(clk)}, o testbench aguarda duas bordas de subida apenas para dar um intervalo inicial antes de liberar o reset.
+\end{frame}
+
+\section{Timer com procedimento}
+
+\begin{frame}[fragile]{Timer com procedimento}
+    O arquivo \texttt{a009c\_timer\_proc.vhd} preserva a ideia do timer, mas encapsula o padrão de incremento.
+
+\begin{lstlisting}
+procedure incrementa(
+    signal   contador : inout unsigned;
+    constant max      : in    positive;
+    constant habilita : in    boolean;
+    variable estouro  : out   boolean
+) is
+begin
+    estouro := false;
+    if habilita then
+        if contador = to_unsigned(max - 1, contador'length) then
+            contador <= to_unsigned(0, contador'length);
+            estouro := true;
+        else
+            contador <= contador + 1;
+        end if;
+    end if;
+end procedure;
+\end{lstlisting}
+
+    \vspace{0.3em}
+    Este procedimento descreve o comportamento: incrementar se estiver habilitado e avisar quando houver estouro.
+\end{frame}
+
+\begin{frame}{Por que estes parâmetros?}
+    \begin{itemize}
+        \item \texttt{signal contador : inout unsigned}: o procedimento altera um registrador do circuito, como \texttt{ticks}, \texttt{segReg}, \texttt{minReg} ou \texttt{horReg}.
+        \item \texttt{constant max : in positive}: o limite é apenas lido; não deve ser modificado.
+        \item \texttt{constant habilita : in boolean}: a condição de avanço também é apenas lida.
+        \item \texttt{variable estouro : out boolean}: a resposta é usada imediatamente dentro do processo para habilitar o próximo contador.
+    \end{itemize}
+
+    \vspace{0.5em}
+    A classe do objeto importa: sinais modelam conexões registradas ou combinacionais; variáveis dentro do processo atualizam imediatamente no fluxo sequencial.
+\end{frame}
+
+\begin{frame}[fragile]{Chamadas em cascata}
+    No processo principal, a mesma variável \texttt{controle} carrega o estouro de um contador para o próximo.
+
+\begin{lstlisting}
+process(clk, nRst) is
+    variable controle : boolean;
+begin
+    if nRst = '0' then
+        ticks  <= (others => '0');
+        segReg <= (others => '0');
+        minReg <= (others => '0');
+        horReg <= (others => '0');
+
+    elsif falling_edge(clk) then
+        incrementa(ticks,  clockFreq, true, controle);
+        incrementa(segReg, 60, controle, controle);
+        incrementa(minReg, 60, controle, controle);
+        incrementa(horReg, 24, controle, controle);
+    end if;
+end process;
+\end{lstlisting}
+
+    \vspace{0.3em}
+    A leitura é quase uma frase: incrementa ticks sempre; se estourar, incrementa segundos; se estourar, incrementa minutos; se estourar, incrementa horas.
+\end{frame}
+
+\begin{frame}{Comparação: antes e depois}
+    \begin{table}
+        \centering
+        \small
+        \begin{tabular}{p{0.42\textwidth} p{0.42\textwidth}}
+            \toprule
+            \textbf{Timer sem procedimento} & \textbf{Timer com procedimento} \\
+            \midrule
+            Mostra toda a lógica explicitamente. & Dá nome à lógica repetida. \\
+            Usa vários \texttt{if} aninhados. & Usa chamadas sequenciais em cascata. \\
+            É fácil de acompanhar no primeiro contato. & É mais fácil de manter e ampliar. \\
+            A repetição aparece no corpo do processo. & A repetição fica concentrada em \texttt{incrementa}. \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+
+    \vspace{0.5em}
+    O procedimento não cria uma ``função de software em execução''. Ele é uma forma de escrever a descrição do hardware de maneira organizada.
+\end{frame}
+
+\begin{frame}{Observações de síntese e estilo}
+    \begin{itemize}
+        \item O procedimento é sintetizável porque contém lógica compatível com hardware: comparações, atribuições e controle simples.
+        \item Com \texttt{unsigned}, a largura do contador fica explícita e as comparações usam \texttt{to\_unsigned}.
+        \item As portas são \texttt{out}; os valores são guardados em sinais internos como \texttt{segReg}, \texttt{minReg} e \texttt{horReg}.
+        \item Usar subprogramas não remove a necessidade de pensar em registradores, bordas de clock e reset.
+    \end{itemize}
+
+    % Nota de fala: reforçar que subprograma em HDL organiza a descrição; não significa execução dinâmica como uma chamada de função em C.
+\end{frame}
+
+\section{Testbench do timer com procedimento}
+
+\begin{frame}[fragile]{Testbench do timer com procedimento}
+    O arquivo \texttt{a009f\_timer\_proc\_tb.vhd} repete a estratégia do testbench anterior.
+
+\begin{lstlisting}
+constant clockFreq : positive := 10;
+constant clkPer    : time := 1000 ms / clockFreq;
+
+signal clk, nRst : std_logic := '0';
+signal segundo   : unsigned(5 downto 0);
+signal minuto    : unsigned(5 downto 0);
+signal hora      : unsigned(4 downto 0);
+\end{lstlisting}
+
+    \vspace{0.4em}
+    A interface observada é a mesma em intenção: clock, reset, segundos, minutos e horas. Agora os contadores aparecem como vetores \texttt{unsigned}.
+\end{frame}
+
+\begin{frame}[fragile]{Mesmo teste, outra implementação}
+\begin{lstlisting}
+i_timer : entity work.a009c_timer_proc(rtl)
+    generic map(
+        clockFreq => clockFreq
+    )
+    port map(
+        clk  => clk,
+        nRst => nRst,
+        s    => segundo,
+        m    => minuto,
+        h    => hora
+    );
+\end{lstlisting}
+
+    \vspace{0.5em}
+    Isso é uma ideia importante em projeto digital: podemos refatorar a implementação interna mantendo a interface. O testbench ajuda a verificar se o comportamento externo continua coerente.
+\end{frame}
+
+\section{Função para display}
+
+\begin{frame}[fragile]{Função para display de sete segmentos}
+    O arquivo \texttt{a009d\_decod.vhd} usa uma função para converter um valor decimal em padrão de segmentos.
+
+\begin{lstlisting}
+function decodificando(valor: integer)
+    return std_logic_vector is
+
+    variable saida : std_logic_vector(0 to 6);
+begin
+    case valor is
+        when 0 => saida := not "1111110";
+        when 1 => saida := not "0110000";
+        when 2 => saida := not "1101101";
+        -- ...
+        when 9 => saida := not "1111011";
+        when others => saida := "0000000";
+    end case;
+
+    return saida;
+end decodificando;
+\end{lstlisting}
+
+    \vspace{0.3em}
+    Aqui a função é natural: entra um inteiro, sai um vetor de sete bits.
+\end{frame}
+
+\begin{frame}{Por que função é adequada aqui?}
+    A decodificação do display tem uma característica simples:
+    \begin{itemize}
+        \item não precisa alterar sinais por conta própria;
+        \item não precisa devolver vários resultados;
+        \item representa uma tabela de conversão;
+        \item pode ser usada diretamente em atribuições.
+    \end{itemize}
+
+    \vspace{0.5em}
+    A função \texttt{decodificando} transforma uma decisão combinacional em um bloco nomeado. Isso melhora a leitura do processo que separa dezena e unidade.
+\end{frame}
+
+\begin{frame}[fragile]{Decomposição em dezena e unidade}
+    O processo do decodificador separa o número decimal em dois dígitos.
+
+\begin{lstlisting}
+process(contador) is
+    variable valor   : integer range 0 to 63;
+    variable dezena  : integer range 0 to 6;
+    variable unidade : integer range 0 to 9;
+begin
+    valor   := to_integer(contador);
+    dezena  := valor / 10;
+    unidade := valor mod 10;
+
+    d1 <= decodificando(dezena);
+    d0 <= decodificando(unidade);
+end process;
+\end{lstlisting}
+
+    \vspace{0.4em}
+    \texttt{to\_integer} converte o \texttt{unsigned} para cálculo decimal. Depois, \texttt{/} faz divisão inteira e \texttt{mod} calcula o resto.
+\end{frame}
+
+\begin{frame}{Detalhe do hardware da placa}
+    Os padrões são escritos com \texttt{not "1111110"}, \texttt{not "0110000"} e assim por diante.
+
+    \vspace{0.5em}
+    Isso indica uma característica comum dos displays de sete segmentos em kits FPGA: os segmentos podem ser ativos em nível baixo. Nesse caso:
+    \begin{itemize}
+        \item bit em \texttt{'0'} acende o segmento;
+        \item bit em \texttt{'1'} apaga o segmento;
+        \item o \texttt{not} adapta uma tabela pensada como ativo alto para a saída ativa baixa.
+    \end{itemize}
+\end{frame}
+
+\section{Top-level}
+
+\begin{frame}[fragile]{Integração no top-level}
+    O arquivo \texttt{a009e\_timer\_proc\_top.vhd} combina o timer com três instâncias do decodificador.
+
+\begin{lstlisting}
+entity a009e_timer_proc_top is
+    generic(
+        clockFreq : positive := 50e6
+    );
+    port(
+        MAX10_CLK1_50 : in  std_logic;
+        KEY           : in  std_logic_vector(0 downto 0);
+        HEX0, HEX1    : out std_logic_vector(0 to 6);
+        HEX2, HEX3    : out std_logic_vector(0 to 6);
+        HEX4, HEX5    : out std_logic_vector(0 to 6)
+    );
+end entity;
+\end{lstlisting}
+
+    \vspace{0.3em}
+    Esta entidade é a ponte entre o projeto VHDL e os pinos do kit DE10-Lite.
+\end{frame}
+
+\begin{frame}{Integração do timer no top-level}
+    \centering
+    \begin{tikzpicture}[
+        font=\scriptsize,
+        block/.style={draw, rounded corners=2pt, thick, align=center, minimum height=0.82cm, fill=blue!6},
+        io/.style={draw, rounded corners=2pt, thick, align=center, minimum height=0.62cm, fill=gray!10},
+        wire/.style={-{Latex[length=2mm]}, thick},
+        bus/.style={-{Latex[length=2mm]}, very thick},
+        note/.style={align=center, font=\tiny}
+    ]
+        \node[io, minimum width=1.8cm] (clk) {MAX10\_CLK1\_50\\clock 50 MHz};
+        \node[io, below=0.55cm of clk, minimum width=1.8cm] (key) {KEY(0)\\reset};
+
+        \node[block, right=1.4cm of clk, yshift=-0.28cm, minimum width=2.2cm, minimum height=1.65cm] (timer) {\texttt{a009c}\\timer com\\procedimento};
+
+        \node[block, right=1.75cm of timer, yshift=0.95cm, minimum width=2.15cm] (decs) {\texttt{a009d}\\decod seg.};
+        \node[block, right=1.75cm of timer, minimum width=2.15cm] (decm) {\texttt{a009d}\\decod min.};
+        \node[block, right=1.75cm of timer, yshift=-0.95cm, minimum width=2.15cm] (dech) {\texttt{a009d}\\decod hora};
+
+        \node[io, right=1.4cm of decs, minimum width=1.55cm] (hexs) {HEX0\\HEX1};
+        \node[io, right=1.4cm of decm, minimum width=1.55cm] (hexm) {HEX2\\HEX3};
+        \node[io, right=1.4cm of dech, minimum width=1.55cm] (hexh) {HEX4\\HEX5};
+
+        \draw[wire] (clk.east) -- node[above, note] {\texttt{clk}} (timer.west);
+        \draw[wire] (key.east) -- node[below, note] {\texttt{nRst}} (timer.west);
+
+        \draw[bus] (timer.east) -- ++(0.65,0) |- node[pos=0.25, above, note] {\texttt{segundos}} (decs.west);
+        \draw[bus] (timer.east) -- node[above, note] {\texttt{minutos}} (decm.west);
+        \draw[bus] (timer.east) -- ++(0.65,0) |- node[pos=0.25, below, note] {\texttt{horas}} (dech.west);
+
+        \draw[bus] (decs.east) -- node[above, note] {7 segmentos} (hexs.west);
+        \draw[bus] (decm.east) -- node[above, note] {7 segmentos} (hexm.west);
+        \draw[bus] (dech.east) -- node[above, note] {7 segmentos} (hexh.west);
+
+        \node[draw, dashed, rounded corners=3pt, fit=(timer)(decs)(decm)(dech), inner sep=0.25cm, label={[font=\scriptsize]above:\texttt{a009e\_timer\_proc\_top}}] {};
+    \end{tikzpicture}
+
+    \vspace{0.6em}
+    O top-level não calcula o tempo nem decodifica segmentos: ele organiza as conexões entre os blocos.
+\end{frame}
+
+\begin{frame}[fragile]{Três decodificadores}
+    Cada contador do timer alimenta um par de displays.
+
+\begin{lstlisting}
+decod_s: entity work.a009d_decod(rtl)
+    port map(contador => segundos, d0 => HEX0, d1 => HEX1);
+
+decod_m: entity work.a009d_decod(rtl)
+    port map(contador => minutos, d0 => HEX2, d1 => HEX3);
+
+decod_h: entity work.a009d_decod(rtl)
+    port map(contador => resize(horas, 6), d0 => HEX4, d1 => HEX5);
+\end{lstlisting}
+
+    \vspace{0.4em}
+    A reutilização aparece em dois níveis: a função é reutilizada dentro do decodificador, e o módulo decodificador é reutilizado três vezes no top-level.
+\end{frame}
+
+\begin{frame}[fragile]{Timer conectado à DE10-Lite}
+\begin{lstlisting}
+timer_0: entity work.a009c_timer_proc(rtl)
+    generic map(
+        clockFreq => clockFreq
+    )
+    port map(
+        clk  => MAX10_CLK1_50,
+        nRst => KEY(0),
+        s    => segundos,
+        m    => minutos,
+        h    => horas
+    );
+\end{lstlisting}
+
+    \vspace{0.4em}
+    O projeto completo usa o clock de 50 MHz da placa, o botão \texttt{KEY(0)} como reset ativo baixo e os displays \texttt{HEX0} a \texttt{HEX5} para mostrar segundos, minutos e horas.
+\end{frame}
+
+\begin{frame}[fragile]{Testbench do top-level}
+    O arquivo \texttt{a009e\_timer\_proc\_top\_tb.vhd} testa a integração completa com frequência reduzida.
+
+\begin{lstlisting}
+dut: entity work.a009e_timer_proc_top(main)
+    generic map(clockFreq => 10)
+    port map(
+        MAX10_CLK1_50 => clk,
+        KEY           => key,
+        HEX0 => HEX0, HEX1 => HEX1,
+        HEX2 => HEX2, HEX3 => HEX3,
+        HEX4 => HEX4, HEX5 => HEX5
+    );
+\end{lstlisting}
+
+    \vspace{0.3em}
+    O teste verifica padrões nos displays: primeiro \texttt{00:00:01}, depois \texttt{00:01:00}. Assim, ele cobre timer, decodificadores e conexões do top-level.
+\end{frame}
+
+\begin{frame}{O que o top-level mostra sobre organização?}
+    O top-level não deveria conter todos os detalhes internos do timer nem todos os detalhes da tabela de sete segmentos.
+
+    \vspace{0.5em}
+    Seu papel é conectar blocos:
+    \begin{itemize}
+        \item o timer produz valores numéricos;
+        \item os decodificadores transformam valores em segmentos;
+        \item os pinos da placa recebem clock, reset e sinais de display.
+    \end{itemize}
+
+    \vspace{0.5em}
+    Subprogramas ajudam dentro dos módulos. Instanciação de entidades ajuda entre módulos. As duas ideias se complementam.
+\end{frame}
+
+\section{VGA}
+
+\begin{frame}[fragile]{Exemplo VGA}
+    O arquivo \texttt{a009j\_vga.vhd} gera três quadrados coloridos em um monitor VGA 800x600 a partir do clock de 50 MHz da DE10-Lite.
+
+\begin{lstlisting}
+entity a009j_vga is
+    port (
+        MAX10_CLK1_50  : in  std_logic;
+        VGA_R          : out std_logic_vector(3 downto 0);
+        VGA_G          : out std_logic_vector(3 downto 0);
+        VGA_B          : out std_logic_vector(3 downto 0);
+        VGA_VS, VGA_HS : out std_logic
+    );
+end entity;
+\end{lstlisting}
+
+    \vspace{0.3em}
+    Este exemplo usa procedimentos para separar duas preocupações: varredura da tela e desenho.
+\end{frame}
+
+\begin{frame}[fragile]{Constantes de temporização}
+    As constantes definem os intervalos horizontal e vertical: área visível, \textit{front porch}, pulso de sincronismo, \textit{back porch} e total.
+
+\begin{lstlisting}
+constant H_ACTIVE_VIDEO : integer := 800;
+constant H_FRONT_PORCH  : integer := H_ACTIVE_VIDEO + 56;
+constant H_SYNC         : integer := H_FRONT_PORCH + 120;
+constant H_BACK_PORCH   : integer := H_SYNC + 64;
+constant H_PIXELS       : integer := 1040;
+
+constant V_ACTIVE_VIDEO : integer := 600;
+constant V_FRONT_PORCH  : integer := V_ACTIVE_VIDEO + 37;
+constant V_SYNC         : integer := V_FRONT_PORCH + 6;
+constant V_BACK_PORCH   : integer := V_SYNC + 23;
+constant V_PIXELS       : integer := 666;
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Procedimento incrementa reutilizado}
+    O mesmo padrão do timer reaparece no controlador VGA: incrementar um contador e informar estouro.
+
+\begin{lstlisting}
+incrementa(horizontal, H_PIXELS, true, controle);
+incrementa(vertical, V_PIXELS, controle, controle);
+\end{lstlisting}
+
+    \vspace{0.5em}
+    A diferença é o significado dos contadores:
+    \begin{itemize}
+        \item \texttt{horizontal}: posição do pixel dentro da linha.
+        \item \texttt{vertical}: posição da linha dentro do quadro.
+    \end{itemize}
+
+    \vspace{0.4em}
+    Quando o contador horizontal estoura, o vertical avança uma linha.
+\end{frame}
+
+\begin{frame}[fragile]{Sincronismos e área ativa}
+    O processo de varredura calcula os pulsos de sincronismo e a região visível.
+
+\begin{lstlisting}
+if horizontal >= H_FRONT_PORCH and horizontal < H_SYNC then
+    VGA_HS <= '0';
+end if;
+
+if vertical >= V_FRONT_PORCH and vertical < V_SYNC then
+    VGA_VS <= '0';
+end if;
+
+if horizontal < H_ACTIVE_VIDEO and vertical < V_ACTIVE_VIDEO then
+    active <= true;
+end if;
+\end{lstlisting}
+
+    \vspace{0.4em}
+    Esta parte é lógica de controle da tela. Ela não decide o que será desenhado; apenas informa onde o feixe lógico está.
+\end{frame}
+
+\begin{frame}[fragile]{Procedimento quadrado}
+    O procedimento \texttt{quadrado} concentra a decisão geométrica de desenho.
+
+\begin{lstlisting}
+procedure quadrado(
+    constant enable : in boolean;
+    constant h, v   : in integer;
+    constant x, y   : in integer;
+    constant w      : in integer;
+    constant color  : in std_logic_vector(11 downto 0);
+    variable draw   : inout std_logic_vector(11 downto 0)
+) is
+begin
+    if enable then
+        if (v >= y - w/2 and v < y + w/2) and
+           (h >= x - w/2 and h < x + w/2) then
+            draw := color;
+        end if;
+    end if;
+end procedure;
+\end{lstlisting}
+
+    \vspace{0.2em}
+    O parâmetro \texttt{draw} é \texttt{variable inout} porque a cor pode ser modificada imediatamente dentro do processo de desenho.
+\end{frame}
+
+\begin{frame}[fragile]{Desenho com chamadas sucessivas}
+    No processo de desenho, o fundo começa preto e cada chamada pode substituir a cor do pixel atual.
+
+\begin{lstlisting}
+draw := (others => '0');
+
+quadrado(active, horizontal, vertical, 350, 275, 60, x"F00", draw);
+quadrado(active, horizontal, vertical, 400, 300, 60, x"0F0", draw);
+quadrado(active, horizontal, vertical, 450, 325, 60, x"00F", draw);
+
+VGA_R <= draw(11 downto 8);
+VGA_G <= draw(7 downto 4);
+VGA_B <= draw(3 downto 0);
+\end{lstlisting}
+
+    \vspace{0.4em}
+    A leitura fica direta: desenhe um quadrado vermelho, um verde e um azul, cada um com centro, tamanho e cor próprios.
+\end{frame}
+
+\begin{frame}{Controle de varredura versus lógica de desenho}
+    O exemplo VGA separa bem duas tarefas:
+    \begin{itemize}
+        \item \textbf{Varredura}: contar pixels e linhas, gerar \texttt{VGA\_HS}, \texttt{VGA\_VS} e \texttt{active}.
+        \item \textbf{Desenho}: decidir a cor RGB para a coordenada atual.
+    \end{itemize}
+
+    \vspace{0.5em}
+    Os procedimentos ajudam porque dão nome às operações repetidas: \texttt{incrementa} para contadores e \texttt{quadrado} para teste geométrico de região.
+
+    \vspace{0.5em}
+    Observação didática: como \texttt{active} é um sinal atribuído no processo clockado, seu valor é atualizado após o ciclo de simulação atual. Em projetos de vídeo mais rigorosos, é comum alinhar sinais de controle e pixels com cuidado.
+\end{frame}
+
+\section{Labs}
+
+\begin{frame}{Atividades de laboratório}
+    As atividades de laboratório estão no repositório da disciplina, nos arquivos Markdown da aula:
+    \begin{itemize}
+        \item \texttt{a009g\_lab\_1.md}: conversor Celsius para Fahrenheit usando função.
+        \item \texttt{a009h\_lab\_2.md}: gerador PWM usando procedimento.
+    \end{itemize}
+
+    \vspace{0.5em}
+    A sequência dos labs acompanha a aula: primeiro uma função com retorno único, depois um procedimento para uma rotina de controle reutilizável.
+\end{frame}
+
+\begin{frame}{Como pensar os labs}
+    \begin{itemize}
+        \item No conversor de temperatura, a função é adequada porque recebe Celsius e retorna Fahrenheit.
+        \item No PWM, o procedimento é adequado porque descreve uma sequência de controle baseada em período, contador e duty cycle.
+        \item Os dois labs devem começar com constantes reduzidas em simulação antes de usar valores adequados ao clock da placa.
+    \end{itemize}
+
+    \vspace{0.5em}
+    Antes de levar para a placa, simule uma versão pequena. Reduzir constantes em testbench é uma estratégia legítima para observar comportamento sem esperar milhões de ciclos.
+\end{frame}
+
+\section{Fechamento}
+
+\begin{frame}{Resumo: função}
+    Use função quando:
+    \begin{itemize}
+        \item a operação retorna um único valor;
+        \item o código pode ser lido como uma expressão;
+        \item não há necessidade de alterar sinais externos;
+        \item a intenção é conversão, cálculo combinacional ou seleção de valor.
+    \end{itemize}
+
+    \vspace{0.5em}
+    Exemplo da aula: \texttt{decodificando(valor)} retorna o padrão de sete segmentos para um dígito.
+\end{frame}
+
+\begin{frame}{Resumo: procedimento}
+    Use procedimento quando:
+    \begin{itemize}
+        \item há uma sequência de comandos reutilizável;
+        \item a operação altera um sinal ou variável passado como parâmetro;
+        \item há mais de uma informação de saída;
+        \item a lógica tem caráter de ação: incrementar, testar estouro, desenhar, atualizar.
+    \end{itemize}
+
+    \vspace{0.5em}
+    Exemplos da aula: \texttt{incrementa} no timer e no VGA; \texttt{quadrado} no processo de desenho.
+\end{frame}
+
+\begin{frame}{Boas práticas}
+    \begin{itemize}
+        \item Comece com subprogramas simples e próximos do problema real.
+        \item Evite subprogramas genéricos demais no início; eles podem esconder a lógica que o aluno ainda precisa enxergar.
+        \item Dê nomes que expressem comportamento: \texttt{incrementa}, \texttt{decodificando}, \texttt{quadrado}.
+        \item Teste com frequências e limites reduzidos antes de usar os valores reais do hardware.
+        \item Para síntese, prefira faixas explícitas quando usar inteiros.
+        \item Mantenha a interface do módulo estável quando refatorar a implementação interna.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Subprogramas e síntese}
+    Em software, uma função costuma ser imaginada como uma chamada executada no tempo.
+
+    \vspace{0.5em}
+    Em VHDL sintetizável, subprogramas são principalmente uma forma de escrever a descrição do hardware:
+    \begin{itemize}
+        \item o sintetizador expande e interpreta a lógica descrita;
+        \item chamadas repetidas podem representar hardware repetido ou lógica compartilhada conforme o contexto;
+        \item o resultado final ainda depende de sinais, processos, clocks, resets e atribuições.
+    \end{itemize}
+
+    \vspace{0.5em}
+    Portanto, subprogramas melhoram organização e reutilização, mas não substituem o raciocínio sobre o circuito.
+\end{frame}
+
+\begin{frame}{Mensagem final}
+    Nesta aula, funções e procedimentos apareceram como resposta a problemas concretos:
+    \begin{itemize}
+        \item a repetição do incremento no timer motivou um procedimento;
+        \item a tabela do display motivou uma função;
+        \item o VGA mostrou procedimentos separando varredura e desenho;
+        \item os testbenches mostraram como validar comportamento sem depender imediatamente do hardware.
+    \end{itemize}
+
+    \vspace{0.5em}
+    O objetivo é escrever VHDL mais claro sem perder de vista o circuito que está sendo descrito.
+\end{frame}
+
+\end{document}

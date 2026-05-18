@@ -1,66 +1,83 @@
 library ieee;
-use ieee.std_logic_1164.all;    -- Permite uso de tipos std_logic e std_logic_vector
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 entity a009c_timer_proc is 
     generic(
-        clockFreq : integer := 50e6  -- Frequência de clock do sistema (padrao 50 MHz)
+        clockFreq : positive := 50e6  -- Frequencia de clock do sistema (padrao: 50 MHz)
     );
     port(
-        clk  : in       std_logic;       -- Sinal de clock de entrada
-        nRst : in       std_logic;       -- Reset assíncrono ativo em nível baixo
-        s    : buffer   integer;       -- Contador de segundos (0–59)
-        m    : buffer   integer;       -- Contador de minutos (0–59)
-        h    : buffer   integer        -- Contador de horas   (0–23)
+        clk  : in  std_logic;             -- Sinal de clock de entrada
+        nRst : in  std_logic;             -- Reset assincrono ativo em nivel baixo
+        s    : out unsigned(5 downto 0);  -- Contador de segundos (0 a 59)
+        m    : out unsigned(5 downto 0);  -- Contador de minutos (0 a 59)
+        h    : out unsigned(4 downto 0)   -- Contador de horas   (0 a 23)
     );
 end entity;
 
 architecture rtl of a009c_timer_proc is
-    -- Sinal interno para acumular ciclos de clock até completar 1 segundo
-    signal ticks : integer := 0;
+    function bits_necessarios(n : positive) return natural is
+        variable valor : natural := n - 1;
+        variable bits  : natural := 0;
+    begin
+        while valor > 0 loop
+            bits  := bits + 1;
+            valor := valor / 2;
+        end loop;
 
-    -- Procedimento auxiliares para incrementar contadores com estouro
+        if bits = 0 then
+            return 1;
+        else
+            return bits;
+        end if;
+    end function;
+
+    -- Sinais internos para guardar o estado do timer.
+    signal ticks  : unsigned(bits_necessarios(clockFreq) - 1 downto 0) := (others => '0');
+    signal segReg : unsigned(5 downto 0) := (others => '0');
+    signal minReg : unsigned(5 downto 0) := (others => '0');
+    signal horReg : unsigned(4 downto 0) := (others => '0');
+
+    -- Procedimento auxiliar para incrementar contadores unsigned com estouro.
     procedure incrementa(
-        signal   contador : inout integer;   -- Variável de contagem a ser incrementada
-        constant max       : in    integer;   -- Limite máximo antes de transbordo
-        constant habilita  : in    boolean;   -- Habilita incremento quando true
-        variable estouro   : out   boolean    -- Indica se houve transbordo no contador
+        signal   contador : inout unsigned;
+        constant max      : in    positive;
+        constant habilita : in    boolean;
+        variable estouro  : out   boolean
     ) is
     begin
-        estouro := false;                 -- Inicializa flag de estouro
-        if habilita then                  -- Só incrementa se habilitado
-            if contador = max - 1 then   -- Verifica condição de transbordo
-                contador <= 0;           -- Reseta contador ao limite
-                estouro := true;         -- Sinaliza que ocorreu transbordo
+        estouro := false;
+        if habilita then
+            if contador = to_unsigned(max - 1, contador'length) then
+                contador <= to_unsigned(0, contador'length);
+                estouro := true;
             else
-                contador <= contador + 1;-- Incrementa contador normalmente
+                contador <= contador + 1;
             end if;
         end if;
     end procedure;
 
 begin
-    -- Processo principal sensível a clk e nRst
-    process(clk, nRst) is
-        variable controle : boolean;      -- Variável para propagar flag de estouro entre procedimentos
-    begin
-        -- Tratamento de reset assíncrono
-        if nRst = '0' then
-            ticks <= 0;  -- Zera o acumulador de ciclos
-            s     <= 0;  -- Zera segundos
-            m     <= 0;  -- Zera minutos
-            h     <= 0;  -- Zera horas
+    s <= segReg;
+    m <= minReg;
+    h <= horReg;
 
-        -- A cada borda de descida do clock, atualiza contadores
+    process(clk, nRst) is
+        variable controle : boolean;
+    begin
+        if nRst = '0' then
+            ticks  <= (others => '0');
+            segReg <= (others => '0');
+            minReg <= (others => '0');
+            horReg <= (others => '0');
+
         elsif falling_edge(clk) then
-            -- Incrementa ticks e captura flag de estouro para 1 segundo
-            incrementa(ticks, clockFreq, true, controle);
-            -- Ao completar 1 segundo (controle=true), incrementa segundos
-            incrementa(s, 60, controle, controle);
-            -- Se houve transbordo de segundos, propaga para minutos
-            incrementa(m, 60, controle, controle);
-            -- Se houve transbordo de minutos, propaga para horas
-            incrementa(h, 24, controle, controle);
+            incrementa(ticks,  clockFreq, true,     controle);
+            incrementa(segReg, 60,        controle, controle);
+            incrementa(minReg, 60,        controle, controle);
+            incrementa(horReg, 24,        controle, controle);
         end if;
     end process;
 end architecture;
 
--- Fim do módulo a009c_timer_proc.vhd
+-- Fim do modulo a009c_timer_proc.vhd
