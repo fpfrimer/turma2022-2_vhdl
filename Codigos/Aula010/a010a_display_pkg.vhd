@@ -9,7 +9,7 @@ use ieee.numeric_std.all;
 package display is
 
 	-- Define um tipo enumerado que representa o tipo de display: anodo comum ou catodo comum
-	type display_type is (anode, catode);
+	type display_type is (anode, cathode);
 	
 	-- Define um vetor de vetores de 7 bits para múltiplos displays de 7 segmentos
 	type display_vector is array(natural range <>) of std_logic_vector(0 to 6);
@@ -21,13 +21,13 @@ package display is
 	function sl_to_dt(mode	:	std_logic) return display_type;
 
 	-- Declara função que converte um número inteiro em um vetor de segmentos para múltiplos dígitos
-	function display(number : integer; digits: positive; num_base : integer; mode : in display_type) return display_vector;
+	function to_display(number : integer; digits: positive; num_base : integer; mode : in display_type) return display_vector;
 
 	-- Declara função que converte um número do tipo unsigned para vetor de displays
-	function display(number : unsigned; digits: positive; num_base : integer; mode : in display_type) return display_vector;
+	function to_display(number : unsigned; digits: positive; num_base : integer; mode : in display_type) return display_vector;
 
 	-- Declara função que converte um std_logic_vector para vetor de displays
-	function display(number : std_logic_vector; digits: positive; num_base : integer; mode : in display_type) return display_vector;
+	function to_display(number : std_logic_vector; digits: positive; num_base : integer; mode : in display_type) return display_vector;
 	
 	-- Declaração do componente contador reutilizável
 	component a010a_counter is
@@ -75,7 +75,7 @@ package body display is
 		end case;
 
 		-- Se for display de cátodo comum, inverte os bits
-		if mode = catode then
+		if mode = cathode then
 			return not segment_out;
 		else
 			return segment_out;
@@ -87,7 +87,7 @@ package body display is
 	function sl_to_dt(mode	:	std_logic) return display_type is
 	begin
 		if mode = '1' then
-			return catode; -- '1' representa cátodo comum
+			return cathode; -- '1' representa cátodo comum
 		else 
 			return anode;  -- '0' representa ânodo comum
 		end if;
@@ -95,7 +95,7 @@ package body display is
 	end function sl_to_dt;
 
 	-- Conversão de número inteiro para vetor de display de 7 segmentos
-	function display(number : integer; digits: positive; num_base : integer; mode : in display_type) return display_vector is
+	function to_display(number : integer; digits: positive; num_base : integer; mode : in display_type) return display_vector is
 		variable dec_digits	:	display_vector(digits - 1 downto 0); -- Vetor para armazenar os dígitos convertidos
 		variable temp			:	integer;                             -- Cópia temporária do número
 	begin
@@ -118,23 +118,23 @@ package body display is
 		-- Retorna vetor com todos os dígitos convertidos
 		return dec_digits;
 
-	-- Fim da função display (versão com inteiro)
-	end function display;
+	-- Fim da função to_display (versão com inteiro)
+	end function to_display;
 
-	-- Versão da função display para valores do tipo unsigned
-	function display(number : unsigned; digits: positive; num_base : integer; mode : in display_type) return display_vector is
+	-- Versão da função to_display para valores do tipo unsigned
+	function to_display(number : unsigned; digits: positive; num_base : integer; mode : in display_type) return display_vector is
 	begin
-		return display(to_integer(number), digits, num_base, mode);
+		return to_display(to_integer(number), digits, num_base, mode);
 
-	-- Fim da função display (unsigned)
-	end function display;
+	-- Fim da função to_display (unsigned)
+	end function to_display;
 
-	-- Versão da função display para std_logic_vector
-	function display(number : std_logic_vector; digits: positive; num_base : integer; mode : in display_type) return display_vector is
+	-- Versão da função to_display para std_logic_vector
+	function to_display(number : std_logic_vector; digits: positive; num_base : integer; mode : in display_type) return display_vector is
 	begin
-		return display(unsigned(number), digits, num_base, mode);
+		return to_display(unsigned(number), digits, num_base, mode);
 
-	end function display;
+	end function to_display;
 
 -- Fim da implementação do corpo do pacote
 end display;
