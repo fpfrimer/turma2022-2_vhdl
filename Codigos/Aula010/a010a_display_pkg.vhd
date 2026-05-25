@@ -32,9 +32,9 @@ package display is
 	-- Declaração do componente contador reutilizável
 	component a010a_counter is
 		generic(
-			clk_freq		:	integer := 50e6;   -- Frequência do clock de entrada
-			update_freq		:	integer := 100;    -- Frequência de atualização do contador
-			n_bits			:	integer := 10      -- Número de bits da saída
+			clk_freq		:	positive := 50e6;  -- Frequência do clock de entrada
+			update_freq		:	positive := 100;   -- Frequência final de atualização em Hz
+			n_bits			:	positive := 10     -- Número de bits da saída
 		);
 		port(
 			clk		:	in		std_logic;                             -- Clock
@@ -51,7 +51,7 @@ package body display is
 
 	-- Implementação da função que decodifica de hexadecimal para display de 7 segmentos
 	function seven_segment_decode (hex_num : in std_logic_vector(3 downto 0); mode : in display_type) return std_logic_vector is
-		variable segment_out : std_logic_vector(6 downto 0); -- Segmentos de saída
+		variable segment_out : std_logic_vector(0 to 6); -- Segmentos de saída: a, b, c, d, e, f, g
 	begin
 		-- Verifica o valor do número hexadecimal e define os segmentos correspondentes
 		case hex_num is
@@ -99,9 +99,9 @@ package body display is
 		variable dec_digits	:	display_vector(digits - 1 downto 0); -- Vetor para armazenar os dígitos convertidos
 		variable temp			:	integer;                             -- Cópia temporária do número
 	begin
-		-- Verifica se a base está entre 0 e 16
-		assert num_base <= 16 and num_base >= 0
-			report "num_base is greater than 16"
+		-- Verifica se a base está entre 2 e 16
+		assert num_base <= 16 and num_base >= 2
+			report "num_base must be between 2 and 16"
 			severity error;
 
 		-- Inicializa variável com o número original
@@ -123,51 +123,16 @@ package body display is
 
 	-- Versão da função display para valores do tipo unsigned
 	function display(number : unsigned; digits: positive; num_base : integer; mode : in display_type) return display_vector is
-		variable dec_digits	:	display_vector(digits - 1 downto 0); -- Vetor para armazenar os dígitos
-		variable temp			:	integer;                             -- Conversão para inteiro
 	begin
-		-- Verifica base válida
-		assert num_base <= 16 and num_base >= 0
-			report "num_base is greater than 16"
-			severity error;
-
-		-- Converte o número unsigned para inteiro
-		temp := to_integer(number);
-
-		-- Loop para conversão de cada dígito
-		for i in 0 to digits - 1 loop
-			-- Converte para 7 segmentos
-			dec_digits(i) := seven_segment_decode(std_logic_vector(to_unsigned(temp mod num_base, 4)), mode);
-			temp := temp / num_base;
-		end loop;
-
-		-- Retorna o vetor final
-		return dec_digits;
+		return display(to_integer(number), digits, num_base, mode);
 
 	-- Fim da função display (unsigned)
 	end function display;
 
 	-- Versão da função display para std_logic_vector
 	function display(number : std_logic_vector; digits: positive; num_base : integer; mode : in display_type) return display_vector is
-		variable dec_digits	:	display_vector(digits - 1 downto 0); -- Vetor para armazenar os dígitos
-		variable temp			:	integer;                             -- Conversão para inteiro
 	begin
-		-- Verifica base válida
-		assert num_base <= 16 and num_base >= 0
-			report "num_base is greater than 16"
-			severity error;
-
-		-- Converte std_logic_vector para inteiro
-		temp := to_integer(unsigned(number));
-
-		-- Loop para conversão dos dígitos
-		for i in 0 to digits - 1 loop
-			dec_digits(i) := seven_segment_decode(std_logic_vector(to_unsigned(temp mod num_base, 4)), mode);
-			temp := temp / num_base;
-		end loop;
-
-		-- Retorna o vetor final
-		return dec_digits;
+		return display(unsigned(number), digits, num_base, mode);
 
 	end function display;
 
@@ -181,9 +146,9 @@ use ieee.numeric_std.all;
 
 entity a010a_counter is
 	generic(
-		clk_freq	:	integer := 50e6;  -- Frequência do clock em Hz
-		update_freq	:	integer := 100;   -- Frequência de atualização
-		n_bits		:	integer := 10     -- Número de bits da saída
+		clk_freq	:	positive := 50e6; -- Frequência do clock em Hz
+		update_freq	:	positive := 100;  -- Frequência final de atualização em Hz
+		n_bits		:	positive := 10    -- Número de bits da saída
 	);
 	port(
 		clk		:	in		std_logic;                         -- Clock de entrada
@@ -194,7 +159,20 @@ entity a010a_counter is
 end entity a010a_counter;
 
 architecture behavioral of a010a_counter is
-	constant max	:	integer := clk_freq / update_freq; -- Número máximo de ciclos de clock antes de incrementar o contador
+	function cycles_per_update(clk_freq_in : positive; update_freq_in : positive) return positive is
+	begin
+		assert update_freq_in <= clk_freq_in
+			report "update_freq must be less than or equal to clk_freq"
+			severity error;
+
+		if update_freq_in > clk_freq_in then
+			return 1;
+		else
+			return clk_freq_in / update_freq_in;
+		end if;
+	end function cycles_per_update;
+
+	constant max	:	positive := cycles_per_update(clk_freq, update_freq); -- Número máximo de ciclos de clock antes de incrementar o contador
 begin
 	process(clk, nRst) is
 		variable ticks	:	integer range 0 to max - 1;            -- Contador interno de ciclos

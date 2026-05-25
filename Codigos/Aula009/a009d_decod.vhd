@@ -36,11 +36,8 @@ begin
         variable dezena  : integer range 0 to 6;
         variable unidade : integer range 0 to 9;
     begin
-        if is_x(std_logic_vector(contador)) then
-            valor := 0;
-        else
-            valor := to_integer(contador);
-        end if;
+        
+        valor := to_integer(contador);     
 
         dezena  := valor / 10;
         unidade := valor mod 10;
