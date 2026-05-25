@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity fsm_toggle is
+entity a010c_toggle is
 	port(
 		MAX10_CLK1_50		:	in		std_logic;
 		KEY					:	in 		std_logic_vector(1 downto 0);
@@ -10,7 +10,7 @@ entity fsm_toggle is
 	);
 end entity;
 
-architecture rtl of fsm_toggle is
+architecture rtl of a010c_toggle is
 
 	constant DEBOUNCE_DELAY : integer := 100000; -- ajustar segundo a frequencia do clock e o tempo de debounce desejado
 
