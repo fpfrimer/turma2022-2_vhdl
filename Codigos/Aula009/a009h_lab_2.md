@@ -1,6 +1,6 @@
-# Lab 2: Testbench com Procedures para o Conversor Binário-BCD
+# Lab 2 opcional: Testbench com Procedures para o Conversor Binário-BCD
 
-**Objetivo:** Criar um testbench para o circuito do Lab 1 usando `procedure` para aplicar entradas e verificar automaticamente as saídas dos displays de sete segmentos.
+**Objetivo:** Criar, opcionalmente, um testbench para o circuito do Lab 1 usando `procedure` para aplicar entradas e verificar automaticamente as saídas dos displays de sete segmentos.
 
 ## Motivação
 
@@ -18,6 +18,8 @@ Como todos os testes seguem o mesmo padrão, uma `procedure` ajuda a evitar repe
 2. esperar a saída estabilizar;
 3. comparar `HEX2`, `HEX1` e `HEX0` com os padrões esperados;
 4. emitir uma mensagem de erro se algo estiver errado.
+
+Procedures podem ser usadas tanto em código sintetizável quanto em simulação, mas elas aparecem com muita frequência em **testbenches**. Em simulação, uma procedure pode organizar sequências de estímulo e verificação, usando comandos como esperas, mensagens e chamadas repetidas. Isso deixa o testbench mais parecido com uma lista de testes e menos parecido com uma sequência longa de comandos copiados.
 
 ## Passos sugeridos
 
