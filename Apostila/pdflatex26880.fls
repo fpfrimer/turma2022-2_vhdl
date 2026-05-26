@@ -1,0 +1,5 @@
+PWD D:/repos/turma2022-2_vhdl/Apostila
+INPUT c:/texlive/2022/texmf.cnf
+INPUT c:/texlive/2022/texmf-dist/web2c/texmf.cnf
+INPUT c:/texlive/2022/texmf-var/web2c/pdftex/pdflatex.fmt
+INPUT main.tex

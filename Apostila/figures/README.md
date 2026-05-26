@@ -1,6 +1,6 @@
-# Imagens geradas da apostila
+# Figuras geradas da apostila
 
-Esta pasta guarda imagens usadas pela apostila que podem ser reconstruidas a
+Esta pasta guarda figuras usadas pela apostila que podem ser reconstruidas a
 partir dos exemplos de codigo.
 
 ## Fluxo geral
@@ -10,7 +10,7 @@ Para gerar uma imagem de formas de onda:
 1. Compile os arquivos VHDL necessarios com GHDL.
 2. Elabore o testbench.
 3. Execute o testbench gerando um arquivo VCD.
-4. Renderize o VCD para PNG com `Scripts/render_vcd.py`.
+4. Renderize o VCD para PNG com `scripts/render_vcd.py`.
 5. Recompile a apostila.
 
 O fluxo assume que os comandos sao executados a partir da pasta `Apostila`.
@@ -20,8 +20,8 @@ O fluxo assume que os comandos sao executados a partir da pasta `Apostila`.
 Exemplo generico:
 
 ```powershell
-ghdl -a Codigos/arquivo_do_circuito.vhd
-ghdl -a Codigos/arquivo_do_testbench.vhd
+ghdl -a code/arquivo_do_circuito.vhd
+ghdl -a code/arquivo_do_testbench.vhd
 ghdl -e nome_da_entidade_do_testbench
 ghdl -r nome_da_entidade_do_testbench --vcd=nome_da_onda.vcd --stop-time=50ns
 ```
@@ -37,7 +37,7 @@ gtkwave nome_da_onda.vcd
 Use o script generico:
 
 ```powershell
-python Scripts/render_vcd.py nome_da_onda.vcd Imagens/nome_da_onda.png `
+python scripts/render_vcd.py nome_da_onda.vcd figures/nome_da_onda.png `
   --signals caminho.sinal1 caminho.sinal2 caminho.sinal3 `
   --labels SINAL1 SINAL2 SINAL3 `
   --title "Titulo da simulacao" `
@@ -58,17 +58,17 @@ Notas:
 ## Exemplo: `onda_and.png`
 
 A imagem `onda_and.png` mostra a simulacao da porta AND descrita em
-`../Codigos/porta_and.vhd` e testada por `../Codigos/tb_porta_and.vhd`.
+`../code/porta_and.vhd` e testada por `../code/tb_porta_and.vhd`.
 
 Comandos:
 
 ```powershell
-ghdl -a Codigos/porta_and.vhd
-ghdl -a Codigos/tb_porta_and.vhd
+ghdl -a code/porta_and.vhd
+ghdl -a code/tb_porta_and.vhd
 ghdl -e tb_AND2
 ghdl -r tb_AND2 --vcd=onda_and.vcd --stop-time=50ns
 
-python Scripts/render_vcd.py onda_and.vcd Imagens/onda_and.png `
+python scripts/render_vcd.py onda_and.vcd figures/onda_and.png `
   --signals tb_and2.a tb_and2.b tb_and2.y `
   --labels A B Y `
   --title "Simulacao da porta AND" `

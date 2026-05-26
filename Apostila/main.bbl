@@ -1,0 +1,39 @@
+\begin{thebibliography}{1}
+
+\bibitem{ashenden2008designer}
+Peter~J. Ashenden.
+\newblock {\em The Designer's Guide to {VHDL}}.
+\newblock Morgan Kaufmann, 3 edition, 2008.
+
+\bibitem{chu2008fpga}
+Pong~P. Chu.
+\newblock {\em {FPGA} Prototyping by {VHDL} Examples}.
+\newblock Wiley-Interscience, 2008.
+
+\bibitem{dewey1983vhdl}
+Allen Dewey.
+\newblock {VHSIC} hardware description language ({VHDL}) development program.
+\newblock In {\em Proceedings of the 20th Design Automation Conference}, 1983.
+
+\bibitem{doulosVhdlHistory}
+{Doulos}.
+\newblock {VHDL} history and evolution.
+\newblock Technical article.
+
+\bibitem{ieee2009vhdl}
+{IEEE Computer Society}.
+\newblock {\em {IEEE Standard VHDL Language Reference Manual}}.
+\newblock IEEE, 2009.
+\newblock IEEE Std 1076-2008.
+
+\bibitem{ieee2018roots}
+{IEEE Solid-State Circuits Society}.
+\newblock The roots of {VHDL}.
+\newblock {\em IEEE Solid-State Circuits Magazine}, 2018.
+
+\bibitem{dod1981requirements}
+{United States Department of Defense}.
+\newblock Requirements for hardware description languages.
+\newblock Technical report, United States Department of Defense, 1981.
+
+\end{thebibliography}

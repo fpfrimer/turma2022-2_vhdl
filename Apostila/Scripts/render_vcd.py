@@ -2,7 +2,7 @@
 """Render scalar VCD signals as a PNG timing diagram.
 
 Example:
-    python Scripts/render_vcd.py onda_and.vcd Imagens/onda_and.png \
+    python scripts/render_vcd.py onda_and.vcd figures/onda_and.png \
         --signals tb_and2.a tb_and2.b tb_and2.y \
         --labels A B Y \
         --title "Simulacao da porta AND" \

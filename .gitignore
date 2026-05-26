@@ -57,3 +57,6 @@ Makefile
 
 **/.qwen
 
+# Perfis temporários usados para capturas de tela com Chrome headless
+Apostila/chrome-profile-*/
+

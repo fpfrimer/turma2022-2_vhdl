@@ -5,13 +5,13 @@ Esta apostila apresenta conceitos fundamentais de VHDL utilizados na disciplina.
 
 \section{O que são Dispositivos Lógicos Programáveis?}
 
-Em um futuro distante, um marceneiro chega ao seu galpão e encontra cubos perfeitos feitos de um material reconfigurável. Com um pequeno dispositivo em mãos, ele carrega um projeto e faz um cubo se transformar em uma mesa; depois, com outro projeto, o mesmo cubo se transforma em uma cadeira ou em uma estante. O objeto físico é o mesmo, mas sua organização interna muda conforme a necessidade.
+Imagine uma bancada formada por vários módulos fixos: pequenas portas lógicas, registradores, multiplexadores e fios que podem ser conectados por meio de chaves configuráveis. A bancada física é sempre a mesma; os módulos não mudam de lugar nem se transformam em outros componentes. O que muda, a cada projeto carregado, é quais conexões ficam ativas entre esses módulos.
 
-O segredo está na divisão de tarefas: o dispositivo armazena os \textit{blueprints} (os planos detalhados de cada móvel), enquanto o cubo é feito de um material inteligente, capaz de se moldar dinamicamente, respeitando apenas os limites de sua massa e volume.
+Com uma configuração, os módulos podem ser conectados para formar um contador. Com outra configuração, os mesmos módulos podem formar um somador, um controlador digital ou parte de um sistema mais complexo. Portanto, a flexibilidade não vem de trocar fisicamente o hardware, mas de reconfigurar as conexões internas entre recursos já existentes.
 
-Embora soe como ficção científica, essa metáfora ilustra o funcionamento dos \textbf{Dispositivos Lógicos Programáveis} (PLDs – \textit{Programmable Logic Devices}): componentes eletrônicos cuja arquitetura interna pode ser configurada pelo usuário para executar funções lógicas específicas, simplesmente carregando um novo “projeto” — ou seja, um novo arquivo de configuração.
+Essa ideia ilustra o funcionamento dos \textbf{Dispositivos Lógicos Programáveis} (PLDs – \textit{Programmable Logic Devices}): componentes eletrônicos formados por blocos lógicos e interconexões programáveis. Ao carregar um novo ``projeto'' — ou seja, um novo arquivo de configuração — o usuário define como esses blocos serão conectados para executar uma função lógica específica.
 
-No contexto dos PLDs, o ``material inteligente'' é representado por uma matriz de blocos lógicos e interconexões programáveis. Esses blocos podem ser configurados para realizar operações lógicas variadas, enquanto as interconexões permitem que os blocos se comuniquem, formando circuitos complexos. O \textit{blueprint}, por sua vez, representa o projeto digital. Esse projeto pode ser descrito tanto por diagramas esquemáticos quanto por \textbf{Linguagens de Descrição de Hardware} (HDLs).
+No contexto dos PLDs, os blocos lógicos correspondem aos recursos básicos disponíveis no dispositivo, enquanto as interconexões programáveis funcionam como caminhos configuráveis entre eles. O projeto digital define quais conexões devem ser estabelecidas e como os blocos serão usados. Esse projeto pode ser descrito tanto por diagramas esquemáticos quanto por \textbf{Linguagens de Descrição de Hardware} (HDLs).
 
 \begin{observacao}{Ideia-chave}
 Em um PLD, o hardware não executa uma sequência de instruções como um processador comum. Ele é configurado para se comportar como um circuito digital específico.
@@ -42,7 +42,7 @@ Antes de tentar entender cada palavra, procure três regiões: as bibliotecas us
 \lstinputlisting[
   caption={Descrição VHDL de uma porta AND de duas entradas},
   label={cod:porta_and}
-]{Codigos/porta_and.vhd}
+]{code/porta_and.vhd}
 
 \begin{observacao}{Depois da leitura do código}
 A entidade diz como o circuito aparece para o mundo externo. A arquitetura diz o que acontece dentro dele. Essa separação aparece em praticamente todos os projetos VHDL.
@@ -67,7 +67,7 @@ Não é necessário memorizar a estrutura completa agora. Observe apenas que os 
 \lstinputlisting[
   caption={Testbench para validar a porta AND},
   label={cod:testbench_and}
-]{Codigos/tb_porta_and.vhd}
+]{code/tb_porta_and.vhd}
 
 No Código \ref{cod:testbench_and}, o testbench cria sinais de entrada (\texttt{A} e \texttt{B}) e conecta a unidade sob teste (UUT - \textit{Unit Under Test}), que é a porta AND definida anteriormente. O processo dentro do testbench aplica diferentes combinações de entradas, aguardando 10 nanosegundos entre cada mudança, permitindo observar a saída \texttt{Y} em resposta às entradas. O resultado da simulação pode ser visualizado em uma forma de onda, facilitando a verificação do comportamento correto do circuito, como pode ser visto na Figura \ref{fig:onda_and}.
 
@@ -75,7 +75,7 @@ No Código \ref{cod:testbench_and}, o testbench cria sinais de entrada (\texttt{
     \centering
     \caption{Forma de onda da simulação da porta AND}
     \label{fig:onda_and}
-    \includegraphics[width=0.7\textwidth]{Imagens/onda_and.png}    
+    \includegraphics[width=0.7\textwidth]{figures/onda_and.png}    
 \end{figure}
 
 Dessa forma, o VHDL possui duas formas principais de uso:
@@ -123,7 +123,7 @@ Os próximos capítulos irão aprofundar gradualmente os elementos apresentados 
 
 \begin{enumerate}
     \item O que significa dizer que um PLD pode ser configurado pelo usuário?
-    \item Na metáfora apresentada, o que representa o ``material inteligente''? E o que representa o \textit{blueprint}?
+    \item Na analogia da bancada modular, o que permanece fixo e o que muda quando um novo projeto é carregado?
     \item Por que uma HDL não deve ser entendida como uma linguagem de programação comum?
     \item Quais HDLs são citadas como populares para descrever circuitos digitais em PLDs?
     \item Qual é a função da entidade em um código VHDL?
