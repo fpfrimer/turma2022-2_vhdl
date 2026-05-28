@@ -1,0 +1,698 @@
+\documentclass[12pt,a4paper]{book}
+
+% ------------------------------------------------------------
+% Pacotes gerais
+% ------------------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage[brazil]{babel}
+\usepackage{graphicx}
+% Ajuste de margens: 2 cm em todos os lados
+\usepackage[a4paper,left=2.35cm,right=2.35cm,top=2.55cm,bottom=2.55cm]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{microtype}
+\usepackage{parskip}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage[table]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{hyperref}
+
+% ------------------------------------------------------------
+% Pacotes para código
+% ------------------------------------------------------------
+\usepackage{listings}
+\usepackage{tcolorbox}
+
+% ------------------------------------------------------------
+% Estilo de código VHDL
+% ------------------------------------------------------------
+\definecolor{brand}{RGB}{28,74,118}
+\definecolor{branddark}{RGB}{18,48,79}
+\definecolor{accent}{RGB}{0,137,123}
+\definecolor{softblue}{RGB}{233,241,249}
+\definecolor{codeback}{RGB}{247,249,252}
+\definecolor{codeframe}{RGB}{190,205,222}
+\definecolor{codekeyword}{RGB}{28,74,118}
+\definecolor{codetype}{RGB}{92,53,145}
+\definecolor{codecomment}{RGB}{100,100,100}
+\definecolor{codestring}{RGB}{0,110,80}
+\definecolor{boxback}{RGB}{233,241,249}
+\definecolor{boxframe}{RGB}{0,137,123}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=brand,
+  urlcolor=brand,
+  citecolor=brand,
+  pdftitle={Exemplo UART com Chaves em VHDL},
+  pdfauthor={Prof. Felipe Walter Dafico Pfrimer}
+}
+\urlstyle{same}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.62em}
+\setlist[itemize]{topsep=0.35em,itemsep=0.22em,leftmargin=1.4cm}
+\setlist[enumerate]{topsep=0.35em,itemsep=0.22em,leftmargin=1.4cm}
+
+\pagestyle{fancy}
+\setlength{\headheight}{25pt}
+\fancyhf{}
+\lhead{\textsf{\small Lógica Reconfigurável com VHDL}}
+\rhead{\textsf{\small\leftmark}}
+\cfoot{\textsf{\small\thepage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{brand}\leaders\hrule height \headrulewidth\hfill}}
+\renewcommand{\chaptermark}[1]{\markboth{\thechapter\quad #1}{}}
+
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \cfoot{\textsf{\small\thepage}}
+  \renewcommand{\headrulewidth}{0pt}
+}
+
+\titleformat{\chapter}[display]
+  {\Huge\sffamily\bfseries\color{branddark}}
+  {\chaptertitlename\ \thechapter}
+  {0.4em}
+  {}
+  [\vspace{0.18em}{\color{accent}\titlerule[1pt]}]
+\titleformat{\section}
+  {\Large\sffamily\bfseries\color{branddark}}
+  {\thesection}{0.8em}{}
+  [\vspace{0.12em}{\color{accent}\titlerule[0.8pt]}]
+\titleformat{\subsection}
+  {\large\sffamily\bfseries\color{brand}}
+  {\thesubsection}{0.8em}{}
+\titlespacing*{\chapter}{0pt}{0pt}{1.2em}
+\titlespacing*{\section}{0pt}{1.4em}{0.75em}
+\titlespacing*{\subsection}{0pt}{1.0em}{0.45em}
+
+\captionsetup[figure]{labelfont={bf,color=branddark},textfont=it,skip=6pt}
+\captionsetup[lstlisting]{labelfont={bf,color=branddark},textfont=it,skip=6pt}
+
+\lstdefinelanguage{VHDL}{
+  morekeywords={
+    library,use,all,entity,is,port,in,out,end,architecture,of,
+    begin,and,or,not,signal,process,if,then,else,elsif,when,
+    others,downto,to,component,port,map,
+    generic,constant,variable,wait,for,until,rising_edge,falling_edge,
+    case,loop,while,array,record,package,body,function,procedure
+  },
+  morekeywords=[2]{
+    boolean,bit,bit_vector,integer,natural,positive,real,time,
+    std_logic,std_logic_vector,signed,unsigned
+  },
+  sensitive=false,
+  morecomment=[l]--,
+  morestring=[b]"
+}
+
+\renewcommand{\lstlistingname}{Código}
+\renewcommand{\lstlistlistingname}{Lista de Códigos}
+
+\lstset{
+  language=VHDL,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\bfseries\color{codekeyword},
+  keywordstyle=[2]\color{codetype},
+  commentstyle=\itshape\color{codecomment},
+  stringstyle=\color{codestring},
+  backgroundcolor=\color{codeback},
+  frame=single,
+  rulecolor=\color{codeframe},
+  numbers=left,
+  numberstyle=\scriptsize\color{codecomment},
+  stepnumber=1,
+  numbersep=7pt,
+  xleftmargin=20pt,
+  framexleftmargin=18pt,
+  framextopmargin=4pt,
+  framexbottommargin=4pt,
+  tabsize=2,
+  keepspaces=true,
+  columns=fullflexible,
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=true,
+  captionpos=t
+}
+
+\newtcolorbox{observacao}[1]{
+  colback=boxback,
+  colframe=boxframe,
+  coltitle=white,
+  fonttitle=\bfseries,
+  title={#1},
+  arc=1mm,
+  boxrule=0.6pt,
+  left=6pt,
+  right=6pt,
+  top=5pt,
+  bottom=5pt
+}
+
+\tikzset{
+  bloco/.style={draw=brand, rounded corners=2pt, fill=softblue, align=center, minimum height=8mm, font=\small\sffamily},
+  proc/.style={draw=codetype, rounded corners=2pt, fill=purple!8, align=center, minimum height=9mm, font=\small\sffamily},
+  sinal/.style={draw=orange!80!black, rounded corners=2pt, fill=yellow!12, align=center, minimum height=7mm, font=\small\sffamily},
+  entrada/.style={draw=blue!70!black, rounded corners=2pt, fill=blue!8, align=center, minimum height=7mm, font=\small\sffamily},
+  saida/.style={draw=green!50!black, rounded corners=2pt, fill=green!8, align=center, minimum height=7mm, font=\small\sffamily},
+  decisao/.style={diamond, draw=orange!85!black, fill=yellow!12, aspect=2.2, align=center, inner sep=1pt, font=\small\sffamily},
+  seta/.style={-{Latex[length=2.2mm]}, thick, color=branddark}
+}
+
+% ------------------------------------------------------------
+\title{Exemplo UART com Chaves em VHDL}
+\author{Prof. Felipe Walter Dafico Pfrimer}
+\date{\today}
+
+\begin{document}
+\hypersetup{pageanchor=false}
+\pagenumbering{gobble}
+\begin{titlepage}
+\thispagestyle{empty}
+\begin{tikzpicture}[remember picture,overlay]
+  \fill[branddark] (current page.north west) rectangle (current page.south east);
+  \fill[accent] (current page.north west) rectangle ([yshift=-0.22cm]current page.north east);
+  \fill[accent] ([yshift=0.22cm]current page.south west) rectangle (current page.south east);
+  \draw[white, line width=0.7pt, opacity=0.45]
+    ([xshift=1.35cm,yshift=-1.35cm]current page.north west)
+    rectangle
+    ([xshift=-1.35cm,yshift=1.35cm]current page.south east);
+\end{tikzpicture}
+
+\vspace*{2.2cm}
+{\sffamily\color{white}
+{\Large Material complementar}\\[1.2cm]
+{\Huge\bfseries Envio UART}\\[0.18cm]
+{\Huge\bfseries do valor das chaves}\\[0.45cm]
+{\LARGE Conversão BCD, FSM e comunicação serial}\\[1.0cm]
+{\Large Exemplo comentado em VHDL para a DE10-Lite}\\[2.0cm]
+{\large Prof. Felipe Walter Dafico Pfrimer}
+}
+
+\vfill
+
+\colorbox{white}{
+  \parbox{0.88\textwidth}{
+    \color{branddark}
+    \textbf{\textsf{Objetivo}}\\[0.35em]
+    Este documento explica, em detalhes, o exemplo \texttt{uart\_sw.vhd}: leitura das chaves, conversão binário-BCD, exibição em displays, transmissão serial UART e controle por máquina de estados.
+  }
+}
+
+\vspace*{1.0cm}
+{\sffamily\color{white}\today}
+\end{titlepage}
+
+\frontmatter
+\hypersetup{pageanchor=true}
+
+\tableofcontents
+\newpage
+
+\mainmatter
+
+\chapter{Envio UART do valor das chaves}
+
+\section{Visão geral}
+
+O exemplo \texttt{uart\_sw.vhd} integra quatro ideias importantes em um único circuito: leitura de chaves, conversão numérica, exibição local e comunicação serial. A comunicação serial usa UART, sigla de \textit{Universal Asynchronous Receiver/Transmitter}, isto é, transmissor/receptor assíncrono universal. A entrada principal é o vetor \texttt{SW(7 downto 0)}, interpretado como um número binário sem sinal entre 0 e 255. Esse valor é mostrado nos displays de sete segmentos e também transmitido pela UART como texto decimal.
+
+As chaves \texttt{SW(9 downto 8)} não fazem parte do valor numérico. Elas selecionam o terminador da linha enviada pela UART: \texttt{LF} (\textit{Line Feed}, avanço de linha), \texttt{CR} (\textit{Carriage Return}, retorno de carro), \texttt{CRLF} (\textit{Carriage Return} seguido de \textit{Line Feed}) ou nenhum terminador. Essa escolha facilita testar o circuito com terminais seriais que esperam convenções diferentes de fim de linha.
+
+\begin{observacao}{Ideia central}
+O circuito envia uma fotografia periódica das chaves pela UART. Os displays acompanham as chaves continuamente, enquanto a UART captura o valor somente no instante em que prepara uma nova transmissão.
+\end{observacao}
+
+A Figura~\ref{fig:fluxo-funcional} representa o diagrama funcional do exemplo. O mesmo valor lido das chaves alimenta a conversão BCD (\textit{Binary-Coded Decimal}, decimal codificado em binário) por meio do algoritmo Double Dabble. A partir da conversão, um ramo atualiza os displays e outro prepara os caracteres que serão enviados pela UART. Na mesma figura, existem os seguintes termos chaves:
+
+\begin{itemize}
+  \item \textbf{FSM} significa \textit{Finite State Machine}, ou máquina de estados finitos;
+  \item \textbf{ASCII} significa \textit{American Standard Code for Information Interchange}, o padrão usado para representar caracteres;
+  \item \textbf{8N1} indica uma UART com 8 bits de dados, sem paridade e 1 bit de parada.
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tikzpicture}[node distance=1.3cm and 1.5cm]
+  \node[entrada] (sw) {SW\\chaves};
+  \node[proc, right=of sw] (bcd) {Double Dabble\\binário para BCD};
+  \node[proc, above right=0.7cm and 1.35cm of bcd] (disp) {decodificador\\7 segmentos};
+  \node[proc, below right=0.7cm and 1.35cm of bcd] (fsm) {FSM de envio\\buffer ASCII};
+  \node[proc, right=of fsm] (uart) {transmissor\\UART 8N1};
+  \node[saida, right=of disp] (hex) {HEX2..HEX0};
+  \node[saida, right=of uart] (tx) {ARDUINO\_IO(1)\\tx};
+
+  \draw[seta] (sw) -- (bcd);
+  \draw[seta] (bcd) -- (disp);
+  \draw[seta] (disp) -- (hex);
+  \draw[seta] (bcd) -- (fsm);
+  \draw[seta] (fsm) -- (uart);
+  \draw[seta] (uart) -- (tx);
+\end{tikzpicture}
+}
+\caption{Fluxo funcional simplificado do exemplo.}
+\label{fig:fluxo-funcional}
+\end{figure}
+
+Espera-se que o leitor já tenha familiaridade com esses conceitos, mas o exemplo é comentado de forma a explicar cada um deles. O código completo do exemplo está disponível no repositório da disciplina, e os trechos mais relevantes são reproduzidos ao longo deste documento.
+
+Caso o leitor queira testar o exemplo, ele pode ser sintetizado e programado na placa DE10-Lite ou adaptado para outras plataformas. Para receber a transmissão UART, pode-se usar um conversor USB-serial e um terminal como PuTTY, Tera Term ou minicom. A taxa de baud deve ser configurada para 115200, e o terminal deve estar preparado para interpretar os caracteres ASCII enviados.
+
+\section{Interface da entidade e parâmetros}
+
+A entidade foi escrita para ser usada diretamente no kit DE10-Lite, mas pode ser adaptada para outras plataformas. A configuração de pinagem do FPGA pode ser importada para o projeto por meio do arquivo \texttt{de10\_lite.qsf}, presente na pasta deste exemplo. O clock principal é recebido por \texttt{MAX10\_CLK1\_50}; o botão \texttt{KEY(0)} é usado como reset ativo em nível baixo; as chaves \texttt{SW} definem o valor transmitido e a opção de fim de linha; a saída serial aparece em \texttt{ARDUINO\_IO(1)}. Na nomenclatura da placa, \texttt{HEX} identifica os displays de sete segmentos e \texttt{LEDR} identifica os LEDs vermelhos.
+
+\begin{lstlisting}[caption={Interface principal do exemplo uart\_sw.}]
+entity uart_sw is
+    generic (
+        frequency : integer := 50000000;
+        baudrate  : integer := 115200;
+        delay_ms  : integer := 200
+    );
+    port (
+        MAX10_CLK1_50 : in    std_logic;
+        KEY           : in    std_logic_vector(1 downto 0);
+        SW            : in    std_logic_vector(9 downto 0);
+        LEDR          : out   std_logic_vector(9 downto 0);
+        ARDUINO_IO    : inout std_logic_vector(15 downto 0);
+        HEX0          : out   std_logic_vector(6 downto 0);
+        HEX1          : out   std_logic_vector(6 downto 0);
+        HEX2          : out   std_logic_vector(6 downto 0)
+    );
+end entity;
+\end{lstlisting}
+
+Os três \textit{generics} deixam o exemplo ajustável. O parâmetro \texttt{frequency} define a frequência do clock de entrada; \texttt{baudrate} define a taxa de símbolos da UART; e \texttt{delay\_ms} define o intervalo entre linhas transmitidas. No uso real com a DE10-Lite, os valores padrão representam clock de 50 MHz, UART a 115200 baud e envio a cada 200 ms.
+
+\begin{observacao}{Sobre baud rate}
+Em UART, o período de um bit é o inverso da taxa em baud. Para 115200 baud, cada bit dura aproximadamente 8{,}68~\textmu s, pois \(T_{bit}=1/115200\)~s \cite{mbedded_uart}.
+\end{observacao}
+
+\section{Conversão binário-BCD com Double Dabble}
+
+O valor das chaves é naturalmente binário, mas humanos leem com mais facilidade a representação decimal. Para transformar um número binário em dígitos decimais sem usar divisores por 10 no hardware, o exemplo usa o algoritmo Double Dabble, também conhecido como \textit{shift-and-add-3}. A ideia é percorrer os bits do número binário e construir, por deslocamentos, os dígitos BCD correspondentes \cite{double_dabble_wiki}.
+
+No circuito, a função \texttt{to\_bcd} recebe um vetor de 8 bits e devolve 12 bits. Esses 12 bits são organizados em três grupos de 4 bits:
+
+\begin{align*}
+\texttt{bcd(11 downto 8)} &= \text{centena},\\
+\texttt{bcd(7 downto 4)}  &= \text{dezena},\\
+\texttt{bcd(3 downto 0)}  &= \text{unidade}.
+\end{align*}
+
+A Figura~\ref{fig:double-dabble-etapa} mostra a decisão repetida a cada bit de entrada. Antes do deslocamento, cada dígito BCD é testado; se ele for maior que 4, recebe a soma de 3. Depois disso, o conjunto é deslocado e recebe o próximo bit do número binário.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[node distance=1.05cm and 1.2cm]
+  \node[entrada] (in) {valor binário\\8 bits};
+  \node[decisao, right=of in] (cmp) {dígito BCD\\maior que 4?};
+  \node[proc, right=of cmp] (add) {soma 3\\ao dígito};
+  \node[proc, below=of cmp] (shift) {desloca BCD\\e insere bit};
+  \node[saida, right=of shift] (out) {BCD\\centena dezena unidade};
+
+  \draw[seta] (in) -- (cmp);
+  \draw[seta] (cmp) -- node[above]{sim} (add);
+  \draw[seta] (add) |- (shift);
+  \draw[seta] (cmp) -- node[left]{não} (shift);
+  \draw[seta] (shift) -- (out);
+\end{tikzpicture}
+\caption{Etapa conceitual do Double Dabble para cada bit processado.}
+\label{fig:double-dabble-etapa}
+\end{figure}
+
+\begin{lstlisting}[caption={Função de conversão binário-BCD.}]
+function to_bcd(value : std_logic_vector(7 downto 0)) return std_logic_vector is
+    variable bcd_value : unsigned(11 downto 0) := (others => '0');
+begin
+    for i in 7 downto 0 loop
+        if bcd_value(3 downto 0) > to_unsigned(4, 4) then
+            bcd_value(3 downto 0) := bcd_value(3 downto 0) + to_unsigned(3, 4);
+        end if;
+
+        if bcd_value(7 downto 4) > to_unsigned(4, 4) then
+            bcd_value(7 downto 4) := bcd_value(7 downto 4) + to_unsigned(3, 4);
+        end if;
+
+        if bcd_value(11 downto 8) > to_unsigned(4, 4) then
+            bcd_value(11 downto 8) := bcd_value(11 downto 8) + to_unsigned(3, 4);
+        end if;
+
+        bcd_value := bcd_value(10 downto 0) & value(i);
+    end loop;
+
+    return std_logic_vector(bcd_value);
+end function;
+\end{lstlisting}
+
+O teste usa a comparação com 4, em vez de escrever ``maior ou igual a 5''. Como os dígitos BCD são inteiros de 0 a 9, as expressões \texttt{> 4} e \texttt{>= 5} são equivalentes. Após a soma de 3, o grupo de 4 bits pode ficar temporariamente maior que 9; isso não é erro. Esse valor intermediário é corrigido pelo deslocamento seguinte, que propaga o ajuste para o próximo dígito decimal.
+
+\section{Displays de sete segmentos}
+
+Além de transmitir o valor pela UART, o exemplo mostra o número nos displays \texttt{HEX2}, \texttt{HEX1} e \texttt{HEX0}. Essa saída é combinacional: sempre que \texttt{data} muda, a função \texttt{to\_bcd} é chamada em uma variável local e cada dígito BCD é convertido para o padrão de segmentos correspondente.
+
+\begin{lstlisting}[caption={Processo combinacional que atualiza os displays.}]
+process(data) is
+    variable display_bcd : std_logic_vector(11 downto 0);
+begin
+    display_bcd := to_bcd(data);
+
+    HEX0 <= bcd_to_7seg(display_bcd(3 downto 0));
+    HEX1 <= bcd_to_7seg(display_bcd(7 downto 4));
+    HEX2 <= bcd_to_7seg(display_bcd(11 downto 8));
+end process;
+\end{lstlisting}
+
+O processo dos displays não precisa ser clockado, pois seu papel é apenas refletir o estado atual das chaves. Já o envio UART precisa capturar uma fotografia do valor em um instante específico, para evitar que uma mesma linha misture dígitos de leituras diferentes.
+
+\begin{observacao}{Convenção dos displays}
+Neste exemplo, os displays são ativos em nível baixo. Por isso, o padrão para o dígito 0 é \texttt{"1000000"}: o segmento apagado fica em nível alto, e os segmentos acesos ficam em nível baixo.
+\end{observacao}
+
+\section{Transmissor UART 8N1}
+
+UART é uma forma de comunicação serial assíncrona: transmissor e receptor não compartilham um sinal de clock, mas concordam previamente com a taxa de transmissão e com o formato do quadro. A configuração 8N1 usa 8 bits de dados, nenhuma paridade e 1 bit de parada. Nessa configuração, cada byte útil ocupa 10 tempos de bit: 1 bit de início, 8 bits de dados e 1 bit de parada \cite{kuleuven_uart_frame}.
+
+Quando a linha está ociosa, ela permanece em nível alto. Para iniciar um quadro, o transmissor coloca a linha em nível baixo durante um tempo de bit. Em seguida, transmite os 8 bits de dados, começando pelo bit menos significativo. Por fim, coloca a linha em nível alto durante o bit de parada \cite{kuleuven_uart_frame,mbedded_uart}. A Figura~\ref{fig:quadro-uart} representa essa sequência temporal: primeiro vem o bit de início, depois os bits de dados \texttt{b0} a \texttt{b7}, e finalmente o bit de parada.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[x=1.05cm,y=0.8cm, font=\small\sffamily]
+  \draw[->, thick, color=branddark] (-0.3,0) -- (10.7,0) node[right]{tempo};
+  \foreach \x/\lab in {0/start,1/b0,2/b1,3/b2,4/b3,5/b4,6/b5,7/b6,8/b7,9/stop} {
+    \draw[gray!50] (\x,-0.15) -- (\x,1.25);
+    \node[align=center] at (\x+0.5,-0.45) {\lab};
+  }
+  \draw[gray!50] (10,-0.15) -- (10,1.25);
+
+  \draw[very thick, color=brand]
+    (-0.3,1) -- (0,1)
+    -- (0,0) -- (1,0)
+    -- (1,0.85) -- (2,0.85)
+    -- (2,0.2) -- (3,0.2)
+    -- (3,0.85) -- (4,0.85)
+    -- (4,0.2) -- (5,0.2)
+    -- (5,0.2) -- (6,0.2)
+    -- (6,0.85) -- (7,0.85)
+    -- (7,0.2) -- (8,0.2)
+    -- (8,0.85) -- (9,0.85)
+    -- (9,1) -- (10.5,1);
+
+  \node[anchor=east] at (-0.35,1) {1};
+  \node[anchor=east] at (-0.35,0) {0};
+  \node[anchor=south] at (0.5,1.25) {início};
+  \node[anchor=south] at (9.5,1.25) {parada};
+\end{tikzpicture}
+\caption{Estrutura conceitual de um quadro UART 8N1.}
+\label{fig:quadro-uart}
+\end{figure}
+
+O transmissor do exemplo monta esse quadro em \texttt{tx\_reg}. A concatenação \texttt{'1' \& tx\_data \& '0'} coloca o bit de parada na posição mais alta, os 8 bits de dados no meio e o bit de início na posição mais baixa. Como o processo envia \texttt{tx\_reg(bit\_count)} começando em \texttt{bit\_count = 0}, o bit de início sai primeiro.
+
+\begin{lstlisting}[caption={Núcleo do transmissor UART.}]
+if tx_load = '1' and busy = '0' then
+    tx_reg    <= '1' & tx_data & '0';
+    busy      := '1';
+    bit_count := 0;
+elsif tx_en = '1' and busy = '1' then
+    if bit_count < 10 then
+        tx        <= tx_reg(bit_count);
+        bit_count := bit_count + 1;
+    else
+        tx        <= '1';
+        tx_done   <= '1';
+        bit_count := 0;
+        busy      := '0';
+    end if;
+end if;
+\end{lstlisting}
+
+A variável \texttt{busy} é interna ao processo. Ela impede que um novo byte seja carregado enquanto o quadro atual ainda está sendo transmitido. O sinal \texttt{tx\_done}, por outro lado, é visível para a máquina de estados de envio: ele gera um pulso de um ciclo quando o transmissor terminou o byte atual.
+
+\section{Geração do baud rate}
+
+O transmissor não deve mudar de bit a cada ciclo de clock de 50 MHz. Ele só deve avançar no ritmo definido por \texttt{baudrate}. Por isso, há um processo separado que conta ciclos de clock e produz um pulso \texttt{tx\_en} de um ciclo quando chega o instante de transmitir o próximo bit.
+
+O número de ciclos de clock por bit é calculado por:
+
+\[
+\texttt{baud\_cycles}=\frac{\texttt{frequency}}{\texttt{baudrate}}.
+\]
+
+Com os valores padrão, \(50\,000\,000/115\,200 \approx 434\). O uso de divisão inteira produz uma aproximação. Para atividades didáticas e baud rates comuns, esse erro costuma ser pequeno o bastante para a comunicação funcionar com folga.
+
+\begin{lstlisting}[caption={Gerador de pulso na frequência de baud.}]
+process(clk, rst_n)
+    variable baud_count : integer range 0 to baud_cycles := 0;
+begin
+    if rst_n = '0' then
+        tx_en      <= '0';
+        baud_count := 0;
+    elsif rising_edge(clk) then
+        if baud_count < baud_cycles - 1 then
+            baud_count := baud_count + 1;
+            tx_en      <= '0';
+        else
+            baud_count := 0;
+            tx_en      <= '1';
+        end if;
+    end if;
+end process;
+\end{lstlisting}
+
+\begin{observacao}{Separação de responsabilidades}
+O gerador de baud não sabe qual byte está sendo enviado. O transmissor UART não sabe quando uma nova linha deve começar. A FSM de envio não sabe como serializar cada bit. Essa separação deixa cada processo menor e mais fácil de depurar.
+\end{observacao}
+
+\section{Máquina de estados de envio}
+
+A transmissão de uma linha completa é controlada por uma máquina de estados finitos. Em termos conceituais, uma FSM descreve um circuito cujo comportamento depende do estado atual e das entradas observadas naquele instante. A organização usada aqui se aproxima de uma máquina de Moore, pois as ações principais estão associadas aos estados do controle, embora algumas decisões de transição dependam de sinais internos como \texttt{tx\_done} \cite{moore_machine_wiki,mealy_machine_wiki}.
+
+O tipo enumerado torna os estados legíveis no código:
+
+\begin{lstlisting}[caption={Estados usados para controlar o envio da linha.}]
+type state_type is (IDLE, LOAD_BYTE, WAIT_BYTE);
+\end{lstlisting}
+
+O estado \texttt{IDLE} espera o tempo definido por \texttt{delay\_ms}. Quando esse tempo termina, o circuito captura o valor das chaves, converte para BCD, monta um pequeno buffer de caracteres ASCII e escolhe de qual posição o envio deve começar. O estado \texttt{LOAD\_BYTE} entrega um byte ao transmissor UART. O estado \texttt{WAIT\_BYTE} aguarda o pulso \texttt{tx\_done}; quando o byte acaba, a FSM decide se volta para \texttt{IDLE} ou se carrega o próximo caractere. A Figura~\ref{fig:fsm-envio} organiza essas transições e deixa claro que a permanência em \texttt{WAIT\_BYTE} depende do término do byte atual.
+
+\begin{figure}[h]
+\centering
+\resizebox{0.95\textwidth}{!}{
+\begin{tikzpicture}[node distance=1.35cm and 2.0cm]
+  \node[proc] (idle) {IDLE\\espera delay\\prepara buffer};
+  \node[proc, below left=of idle] (load) {LOAD\_BYTE\\carrega tx\_data\\ativa tx\_load};
+  \node[proc, below right=of idle] (wait) {WAIT\_BYTE\\aguarda tx\_done};
+
+  \draw[seta] (idle) to[bend right=18] node[left, align=center]{delay\\completo} (load);
+  \draw[seta] (load) -- node[below, align=center]{byte\\solicitado} (wait);
+  \draw[seta] (wait) to[bend right=18] node[below, align=center]{tx\_done='1'\\há próximo byte} (load);
+  \draw[seta] (wait) to[bend left=18] node[right, align=center]{tx\_done='1'\\fim da linha} (idle);
+  \draw[seta] (idle) edge[loop above] node[align=center]{delay\\em contagem} (idle);
+\end{tikzpicture}
+}
+\caption{Transições principais da FSM que controla o envio dos bytes.}
+\label{fig:fsm-envio}
+\end{figure}
+
+Uma decisão importante aparece no fim do estado \texttt{IDLE}: o circuito remove zeros à esquerda. O buffer sempre é montado com centena, dezena e unidade, mas \texttt{char\_index} escolhe onde a transmissão começa. Assim, 7 é enviado como \texttt{"7"}, e não como \texttt{"007"}; 42 é enviado como \texttt{"42"}, e não como \texttt{"042"}.
+
+\begin{lstlisting}[caption={Escolha do primeiro dígito transmitido.}]
+if captured_bcd(11 downto 8) /= "0000" then
+    char_index <= 0; -- envia centena, dezena e unidade
+elsif captured_bcd(7 downto 4) /= "0000" then
+    char_index <= 1; -- envia dezena e unidade
+else
+    char_index <= 2; -- envia apenas unidade
+end if;
+\end{lstlisting}
+
+O caso do valor zero merece atenção: como centena e dezena são zero, o circuito começa em \texttt{char\_index = 2}. Isso preserva um caractere útil na transmissão. Portanto, o valor 0 é enviado como \texttt{"0"}, e não como uma linha vazia.
+
+\section{Buffer ASCII e fim de linha}
+
+A UART transmite bytes. Para enviar o número decimal como texto, cada dígito BCD precisa virar um caractere ASCII. Os caracteres \texttt{'0'} até \texttt{'9'} têm códigos de \texttt{x"30"} até \texttt{x"39"}. Como cada dígito BCD ocupa 4 bits, basta concatenar \texttt{x"3"} com o dígito.
+
+\begin{lstlisting}[caption={Montagem dos dígitos decimais como caracteres ASCII.}]
+tx_buffer(0) <= x"3" & captured_bcd(11 downto 8);
+tx_buffer(1) <= x"3" & captured_bcd(7 downto 4);
+tx_buffer(2) <= x"3" & captured_bcd(3 downto 0);
+\end{lstlisting}
+
+Depois dos dígitos, o exemplo pode enviar um terminador de linha. Essa opção é controlada por \texttt{SW(9 downto 8)}, usando as duas chaves que não fazem parte do valor numérico. A Tabela~\ref{tab:terminador-linha} lista as quatro combinações possíveis e o efeito de cada uma no fim da mensagem transmitida.
+
+\begin{table}[h]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tabular}{ccl}
+\rowcolor{softblue}
+\textbf{\texttt{SW(9 downto 8)}} & \textbf{Bytes enviados após o número} & \textbf{Uso típico} \\
+\texttt{"00"} & \texttt{LF} \quad \texttt{x"0A"} & nova linha em muitos terminais \\
+\texttt{"01"} & \texttt{CR} \quad \texttt{x"0D"} & retorno de carro \\
+\texttt{"10"} & \texttt{CRLF} \quad \texttt{x"0D" x"0A"} & convenção comum em terminais seriais \\
+\texttt{"11"} & nenhum & envio apenas dos dígitos \\
+\end{tabular}
+}
+\caption{Seleção do terminador de linha.}
+\label{tab:terminador-linha}
+\end{table}
+
+A escolha do terminador também define \texttt{last\_index}, isto é, a última posição do buffer que deve ser transmitida. Quando a opção é \texttt{CRLF}, o buffer usa cinco posições: três dígitos, \texttt{CR} e \texttt{LF}. Quando não há terminador, a última posição é o dígito da unidade.
+
+\begin{lstlisting}[caption={Escolha do terminador e da última posição do buffer.}]
+case SW(9 downto 8) is
+    when "00" =>
+        tx_buffer(3) <= x"0A"; -- LF
+        last_index   <= 3;
+
+    when "01" =>
+        tx_buffer(3) <= x"0D"; -- CR
+        last_index   <= 3;
+
+    when "10" =>
+        tx_buffer(3) <= x"0D"; -- CR
+        tx_buffer(4) <= x"0A"; -- LF
+        last_index   <= 4;
+
+    when others =>
+        last_index   <= 2;     -- sem fim de linha
+end case;
+\end{lstlisting}
+
+\section{Testbench do exemplo}
+
+O arquivo \texttt{uart\_sw\_tb.vhd} testa o circuito sem depender da placa. Em um testbench, o circuito testado costuma ser chamado de DUT, de \textit{Device Under Test}, ou dispositivo sob teste. Para deixar a simulação rápida, o testbench troca os valores reais dos \textit{generics} por valores menores: clock de 1 kHz, baud rate de 100 baud e atraso entre envios de 1 ms. O comportamento lógico continua o mesmo, mas a simulação termina em muito menos tempo.
+
+\begin{lstlisting}[caption={Instanciação do DUT com parâmetros reduzidos para simulação.}]
+dut : entity work.uart_sw
+    generic map (
+        frequency => frequency_tb,
+        baudrate  => baudrate_tb,
+        delay_ms  => delay_ms_tb
+    )
+    port map (
+        MAX10_CLK1_50 => clk,
+        KEY           => key,
+        SW            => sw,
+        LEDR          => ledr,
+        ARDUINO_IO    => arduino_io,
+        HEX0          => hex0,
+        HEX1          => hex1,
+        HEX2          => hex2
+    );
+\end{lstlisting}
+
+A parte mais interessante do testbench é a leitura do sinal serial. O procedimento \texttt{recebe\_byte} espera uma borda de descida em \texttt{rx}, que corresponde ao bit de início. Depois ele avança para o meio do primeiro bit de dados e amostra os 8 bits seguintes. Essa estratégia imita o comportamento básico de um receptor UART em simulação.
+
+\begin{lstlisting}[caption={Procedimento que recebe um byte UART no testbench.}]
+procedure recebe_byte(
+    signal rx  : in  std_logic;
+    variable ch : out std_logic_vector(7 downto 0)
+) is
+begin
+    wait until falling_edge(rx);
+
+    wait for bit_period + bit_period / 2;
+    for i in 0 to 7 loop
+        ch(i) := rx;
+        wait for bit_period;
+    end loop;
+
+    assert rx = '1'
+        report "Bit de parada da UART deveria estar em nivel alto"
+        severity error;
+end procedure;
+\end{lstlisting}
+
+Embora o documento da disciplina possa apresentar \texttt{assert} em outro momento, aqui vale observar a utilidade prática: ele transforma uma verificação em uma mensagem automática de erro. A lógica de teste fica concentrada no procedimento \texttt{confere\_byte}, que recebe um byte da UART e compara com o valor esperado.
+
+\begin{lstlisting}[caption={Exemplos de estímulos usados no testbench.}]
+sw <= std_logic_vector(to_unsigned(42, sw'length));
+confere_byte(arduino_io(1), x"34", "Falha no valor 42: esperado caractere '4'");
+confere_byte(arduino_io(1), x"32", "Falha no valor 42: esperado caractere '2'");
+confere_byte(arduino_io(1), x"0A", "Falha no valor 42: esperado LF");
+
+sw <= "10" & std_logic_vector(to_unsigned(5, 8));
+confere_byte(arduino_io(1), x"35", "Falha no valor 5 com CRLF: esperado caractere '5'");
+confere_byte(arduino_io(1), x"0D", "Falha no valor 5 com CRLF: esperado CR");
+confere_byte(arduino_io(1), x"0A", "Falha no valor 5 com CRLF: esperado LF");
+\end{lstlisting}
+
+O primeiro bloco confere se o valor 42 é transmitido como os caracteres \texttt{'4'}, \texttt{'2'} e \texttt{LF}. O segundo bloco usa \texttt{SW(9 downto 8) = "10"} e confirma o envio de \texttt{CRLF}. Esses testes cobrem tanto a remoção de zeros à esquerda quanto a seleção do terminador de linha.
+
+\section{Relação entre processos e sinais}
+
+O exemplo é formado por processos concorrentes. Cada processo tem uma responsabilidade local, mas eles se comunicam por sinais. A Figura~\ref{fig:processos-sinais} resume essa relação. As entradas vêm da placa, os processos implementam o comportamento, os sinais internos sincronizam os blocos e as saídas vão para os displays, LEDs e pino serial.
+
+\begin{figure}[h]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tikzpicture}[node distance=1.0cm and 1.2cm]
+  \node[entrada] (clk) {clk\\rst\_n};
+  \node[entrada, below=of clk] (sw) {SW\\data\\line\_end};
+
+  \node[proc, right=1.8cm of clk] (baud) {processo\\baud rate};
+  \node[proc, below=of baud] (disp) {processo\\displays};
+  \node[proc, right=1.8cm of baud] (uart) {processo\\transmissor UART};
+  \node[proc, below=of uart] (fsm) {processo\\FSM de envio};
+
+  \node[sinal, right=1.5cm of fsm] (buf) {tx\_buffer\\char\_index\\last\_index};
+  \node[sinal, above=of buf] (hand) {tx\_data\\tx\_load\\tx\_done\\tx\_en};
+
+  \node[saida, right=1.5cm of uart] (txout) {tx\\ARDUINO\_IO(1)};
+  \node[saida, right=1.5cm of disp] (hex) {HEX2\\HEX1\\HEX0};
+  \node[saida, below=of hex] (led) {LEDR};
+
+  \draw[seta] (clk.east) -- (baud.west);
+  \draw[seta] (clk.east) to[bend left=12] (uart.west);
+  \draw[seta] (clk.east) to[bend right=18] (fsm.west);
+  \draw[seta] (baud) -- node[above]{tx\_en} (uart);
+  \draw[seta] (sw.east) -- (disp.west);
+  \draw[seta] (sw.east) to[bend right=10] (fsm.west);
+  \draw[seta] (sw.east) to[bend right=20] (led.west);
+  \draw[seta] (disp) -- (hex);
+  \draw[seta] (fsm) -- (buf);
+  \draw[seta] (buf) -- (hand);
+  \draw[seta] (fsm) -- (hand);
+  \draw[seta] (hand) to[bend left=10] (uart);
+  \draw[seta] (uart) to[bend left=10] (hand);
+  \draw[seta] (uart) -- (txout);
+\end{tikzpicture}
+}
+\caption{Conexões principais entre processos, sinais internos, entradas e saídas.}
+\label{fig:processos-sinais}
+\end{figure}
+
+\begin{observacao}{Sinais e variáveis}
+\texttt{tx\_done} é sinal porque precisa sair do processo transmissor e ser lido pela FSM. Já \texttt{busy} pode ser variável, pois só interessa dentro do processo transmissor. Essa diferença é uma boa oportunidade para discutir escopo: sinais conectam blocos concorrentes; variáveis organizam cálculo local dentro de um processo.
+\end{observacao}
+
+\section{Pontos de atenção para estudo}
+
+Este exemplo reúne vários conceitos que aparecem separadamente ao longo da disciplina:
+
+\begin{itemize}
+  \item \textbf{Conversão numérica}: \texttt{to\_bcd} transforma o valor binário das chaves em três dígitos BCD.
+  \item \textbf{Reuso de função}: a mesma função de conversão é usada pelos displays e pela FSM de envio.
+  \item \textbf{Codificação para display}: \texttt{bcd\_to\_7seg} converte cada dígito para segmentos ativos em nível baixo.
+  \item \textbf{Comunicação serial}: o transmissor monta quadros UART 8N1, enviando primeiro o bit menos significativo.
+  \item \textbf{Controle sequencial}: a FSM decide quando montar a linha, quando carregar um byte e quando voltar ao repouso.
+  \item \textbf{Sincronização entre blocos}: \texttt{tx\_load}, \texttt{tx\_done} e \texttt{tx\_en} conectam processos com responsabilidades diferentes.
+\end{itemize}
+
+Uma leitura proveitosa do código é seguir um valor concreto, por exemplo 42. Nos displays, o valor passa por \texttt{to\_bcd} e vira \texttt{0}, \texttt{4}, \texttt{2}. Na UART, a FSM captura o mesmo BCD, monta os caracteres \texttt{x"30"}, \texttt{x"34"} e \texttt{x"32"}, descarta o zero à esquerda iniciando em \texttt{char\_index = 1}, acrescenta o terminador selecionado e entrega cada byte ao transmissor.
+
+Do ponto de vista didático, o exemplo também mostra uma escolha de arquitetura: manter a conversão para os displays combinacional e registrar apenas a sequência que será enviada pela UART. Isso evita misturar duas leituras diferentes dentro da mesma linha serial, mas mantém a visualização local responsiva às chaves.
+
+\bibliographystyle{plain}
+\bibliography{referencias_uart}
+
+\end{document}

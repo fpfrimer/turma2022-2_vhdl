@@ -1,0 +1,33 @@
+\begin{thebibliography}{1}
+
+\bibitem{mbedded_uart}
+Geoffrey Hunter.
+\newblock Uart communication protocol.
+\newblock \url{https://blog.mbedded.ninja/electronics/communication-protocols/uart-communication-protocol/}, 2011.
+\newblock Acesso em 28 maio 2026.
+
+\bibitem{kuleuven_uart_frame}
+{KU Leuven COSIC}.
+\newblock Frame format.
+\newblock \url{https://labsite-af5ab6.pages.gitlab.kuleuven.be/Lab2/lab2_4/}, 2024.
+\newblock Acesso em 28 maio 2026.
+
+\bibitem{double_dabble_wiki}
+{Wikipedia contributors}.
+\newblock Double dabble.
+\newblock \url{https://en.wikipedia.org/wiki/Double_dabble}, 2026.
+\newblock Acesso em 28 maio 2026.
+
+\bibitem{mealy_machine_wiki}
+{Wikipedia contributors}.
+\newblock Mealy machine.
+\newblock \url{https://en.wikipedia.org/wiki/Mealy_machine}, 2026.
+\newblock Acesso em 28 maio 2026.
+
+\bibitem{moore_machine_wiki}
+{Wikipedia contributors}.
+\newblock Moore machine.
+\newblock \url{https://en.wikipedia.org/wiki/Moore_machine}, 2026.
+\newblock Acesso em 28 maio 2026.
+
+\end{thebibliography}
