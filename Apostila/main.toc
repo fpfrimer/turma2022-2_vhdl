@@ -18,9 +18,9 @@
 \contentsline {section}{\numberline {2.4}Configuração da extensão VHDL for Professionals}{13}{section.2.4}%
 \contentsline {section}{\numberline {2.5}Instalação do GHDL}{14}{section.2.5}%
 \contentsline {section}{\numberline {2.6}Primeira simulação com GHDL}{15}{section.2.6}%
-\contentsline {section}{\numberline {2.7}Instalação do VaporView}{15}{section.2.7}%
-\contentsline {section}{\numberline {2.8}Visualização de formas de onda}{15}{section.2.8}%
-\contentsline {section}{\numberline {2.9}O papel do Quartus no fluxo completo}{15}{section.2.9}%
+\contentsline {section}{\numberline {2.7}Instalação do VaporView}{16}{section.2.7}%
+\contentsline {section}{\numberline {2.8}Visualização de formas de onda}{16}{section.2.8}%
+\contentsline {section}{\numberline {2.9}O papel do Quartus no fluxo completo}{16}{section.2.9}%
 \contentsline {section}{\numberline {2.10}Automação futura com Tcl}{16}{section.2.10}%
 \contentsline {section}{\numberline {2.11}Fluxo de trabalho recomendado}{16}{section.2.11}%
 \contentsline {section}{\numberline {2.12}Problemas comuns e verificação da instalação}{16}{section.2.12}%
